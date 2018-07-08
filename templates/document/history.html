@@ -1,0 +1,27 @@
+{%  extends 'layout.html' %}
+
+
+{%  block css %}
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{% block navbar_brand %}
+    {{ subject }}
+{% endblock %}
+{%  block title %}
+    <title>{{ subject }} (히스토리) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block section %}
+    <table>
+        <tr>
+            <th>번호</th>
+            <th>수정한 날짜</th>
+        </tr>
+        {% for element in history %}
+        <tr>
+            <td>{{ element['version'] }}</td>
+            <td>{{ element['date'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

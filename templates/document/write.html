@@ -1,0 +1,70 @@
+{%  extends 'layout.html' %}
+
+{%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='write.css') }}">
+{%  endblock %}
+{%  block javascript %}
+    <script src="{{ url_for('static', filename='write.js') }}"></script>
+{%  endblock %}
+{%  block title %}
+    <title>{{ subject }} (편집중) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block navbar_brand %}
+    {{ subject }}
+{% endblock %}
+{% block section %}
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="editor-tab" data-toggle="tab" href="#editor" role="tab" aria-controls="home" aria-selected="true">편집기</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="preview-tab" data-toggle="tab" href="#preview" role="tab" aria-controls="profile" aria-selected="false">미리보기</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="editor" role="tabpanel" aria-labelledby="home-tab">
+      <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" id="input_tab" class="btn btn-secondary">탭 입력</button>
+          <a href="/upload/{{ subject }}"><button type="button" class="btn btn-secondary">파일 업로드</button></a>
+          <a href="/files/{{ subject }}"><button type="button" class="btn btn-secondary">파일 목록</button></a>
+      </div>
+      <form name = "text" action="/save/{{ subject }}" method="post">
+        <div class="form-group">
+            <textarea id='text_editor' name = 'mytext' class="form-control" rows = 30>{% if text %}{{ text|safe }}{% endif %}</textarea>
+        </div>
+        <input type = "submit" value="쓰기" class="btn btn-primary">
+    </form>
+  </div>
+  <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="profile-tab">...</div>
+</div>
+
+    <script>
+    $("#preview-tab").on("click", function() {
+        var text = $("#text_editor").val();
+        console.log(text);
+        $.ajax({
+            url: "/preview",
+            data: {
+                text: text
+            },
+            type: "post",
+            dataType: "json",
+        })
+
+            .done(function (json) {
+                $("#preview").html(json)
+            })
+            .fail(function( xhr, status, errorThrown ) {
+                alert( "Sorry, there was a problem!" );
+                console.log( "Error: " + errorThrown );
+                console.log( "Status: " + status );
+                console.dir( xhr );
+            })
+            // Code to run regardless of success or failure;
+            .always(function( xhr, status ) {
+                console.log('success')
+            });
+    })
+
+    </script>
+{% endblock %}

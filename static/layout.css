@@ -1,0 +1,129 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+* {
+  border-radius: 0 !important;
+}
+
+body{
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.navbar-brand{
+    font-size: 42px;
+    margin: 0 8px 0 8px;
+    padding: 0;
+}
+
+.navbar{
+    padding: 0 8px 0 8px;
+}
+
+#navbar_search input{
+    max-width: 250px;
+}
+
+.sidebar {
+    width: 300px;
+    text-align: center;
+    border-right: 1px solid lightgray;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.col {
+    padding: 0;
+}
+
+.sidebar{
+    padding-top: 10px;
+}
+
+.sidebar #logo{
+    height: 55px;
+    margin-bottom: 5px;
+}
+
+.sidebar .card{
+    text-align: left;
+}
+
+#information{
+    margin-bottom: 10px;
+}
+
+#recent_write, #recent_edit{
+    margin-bottom: 10px;
+}
+
+header a:link, header a:visited, header a:hover, header a:active {
+    color: black;
+    font-size: 32px;
+    text-align: center;
+    margin-top: 16px;
+}
+
+#side_search button {
+    background-color: black;
+    color: white;
+}
+
+#side_search .mb-3{
+    margin-bottom: 10px !important;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+#blog_body {
+    margin: 10px 20px 10px 20px;
+}
+
+#option_bar ul li{
+    list-style: none;
+}
+
+#option_bar ul{
+    text-align: right;
+    padding: 0;
+}
+
+#option_bar {
+    position: fixed;
+    right: 0;
+    bottom: 30px;
+    background: #f8f9fa;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+#option_bar a{
+    color: black;
+}
+
+#option_bar i, .navbar i{
+    min-width: 20px;
+}
+
+#blog_body footer {
+    margin-top: 10px;
+    padding: 10px 0 0 20px;
+    border-top: 1px solid lightgray;
+}
+
+.navbar .hidden{
+    display: none;
+}
+
+@media only screen and (max-width: 990px) {
+    .navbar .hidden{
+        display: inline;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .sidebar {
+        display: none;
+    }
+}

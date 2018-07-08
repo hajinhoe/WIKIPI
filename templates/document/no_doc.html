@@ -1,0 +1,17 @@
+{%  extends 'layout.html' %}
+
+
+{%  block css %}
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{% block navbar_brand %}
+    {{ subject }}
+{% endblock %}
+{%  block title %}
+    <title>{{ subject }} (없는 문서) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block section %}
+    <h1>문서가 없습니다.</h1>
+    <p>문서가 없습니다. <a href="{{ url_for('doc_write', doc_name=subject) }}">{{ subject }}</a> 문서를 만들까요?</p>
+{% endblock %}

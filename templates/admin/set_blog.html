@@ -1,0 +1,40 @@
+{%  extends 'layout.html' %}
+
+{%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{%  block title %}
+    <title>위키 관리 - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block navbar_brand %}
+    위키 관리
+{% endblock %}
+{% block section %}
+    <form name="settings" action="{{ url_for('set_blog_save') }}" method="post">
+        <div class="form-group">
+            <label for="input_name">위키 이름</label>
+            <input value="{{ setting['name'] }}" type="text" class="form-control" id="input_name" name="name">
+        </div>
+        <div class="form-group">
+            <label for="input_information">정보 더 보기 문서</label>
+            <input value="{{ setting['information'] }}" type="text" class="form-control" id="input_information" name="information">
+        </div>
+        <div class="form-group">
+            <label for="input_main">대문 문서</label>
+            <input value="{{ setting['main'] }}" type="text" class="form-control" id="input_main" name="main">
+        </div>
+        <p>아래는 댓글 기능을 위한 DISQUS 정보입니다. 자세한 사항은 도움말 문서를 참고하세요.</p>
+        <div class="form-group">
+            <label for="input_disqus_url">DISQUS URL</label>
+            <input value="{{ setting['disqus_url'] }}" type="text" class="form-control" id="input_disqus_url" name="disqus_url">
+        </div>
+        <div class="form-group">
+            <label for="input_wiki_url">블로그 주소</label>
+            <input value="{{ setting['wiki_url'] }}" type="text" class="form-control" id="input_wiki_url" aria-describedby="wiki_url_help" name="wiki_url">
+            <small id="wiki_url_help" class="form-text text-muted">블로그 도메인 주소를 'https://domain.net/'과 같이 입력하십시오.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">저장</button>
+    </form>
+{% endblock %}

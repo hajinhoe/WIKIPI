@@ -1,0 +1,22 @@
+{%  extends 'layout.html' %}
+
+{% block navbar_brand %}
+    에러
+{% endblock %}
+{%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='document.css') }}">
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{%  block title %}
+    <title>에러 - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block section %}
+    {% if error=='login' %}
+    <h1>로그인을 실패했습니다.</h1>
+    <p>아이디와 비밀번호가 올바른지 확인하십시오.</p>
+    {% else %}
+    <h1>정상적이지 않은 접근입니다.</h1>
+    <p>페이지의 주소가 올바른지 확인하십시오.</p>
+    {% endif %}
+{% endblock %}
