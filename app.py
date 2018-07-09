@@ -1,6 +1,7 @@
 import os
 import secrets
 import bcrypt
+import re
 
 from flask import Flask, render_template, request,\
     jsonify, redirect, session, url_for, flash,\
@@ -42,13 +43,13 @@ def create_app(test_config=None):
 
         db = database.get_db()
 
-        new_db = db.execute("SELECT name FROM docs_list ORDER BY datetime(date) DESC LIMIT 10")
+        new_db = db.execute("SELECT name FROM doc_list ORDER BY datetime(date) DESC LIMIT 10")
         if new_db is not None:
             new_db = new_db.fetchall()
             for row in new_db:
                 for element in row:
                     lists['new'].append(element)
-        edit_db = db.execute("SELECT name FROM (history join docs_list using (id)) as t ORDER BY datetime(t.date) DESC LIMIT 10")
+        edit_db = db.execute("SELECT name FROM (history join doc_list using (id)) as t ORDER BY datetime(t.date) DESC LIMIT 10")
         if edit_db is not None:
             edit_db = edit_db.fetchall()
             for row in edit_db:
@@ -57,8 +58,22 @@ def create_app(test_config=None):
 
         return lists
 
-    def get_setting(file):
+    def get_setting(file): # 설정 파일 불러옴
         return tools.Config('config/' + file).load()
+
+    def is_doc_name(name): # 문서의 이름이 올바른지 검사함
+        if re.search('[/ ]{2,}', name):
+            return False
+        if re.search('^[^/ ].+[^/ ]$', name):
+            return True
+        return False
+
+    def is_doc(name): # 문서가 존재하는지 검사함
+        db = database.get_db()
+        if db.execute('SELECT * FROM doc_list WHERE name=?', (name,)) is not None:
+            return True
+        else:
+            return False
 
     # 문서 관련 페이지
     # 문서 보기
@@ -74,23 +89,29 @@ def create_app(test_config=None):
         db = database.get_db()
 
         name = (doc_name,)
-        text = db.execute("SELECT html_data FROM docs join docs_list using (id) WHERE name = ?", name).fetchone()
+        text = db.execute("SELECT html_data FROM docs join doc_list using (id) WHERE name = ?", name).fetchone()
         a = db.execute("SELECT * FROM docs").fetchone()
 
         sidebar_list = get_current_list()
 
         if text is None:
-            return render_template('document/no_doc.html', subject=doc_name, setting=get_setting('wiki'),
+            return render_template('document/not_such_doc.html', subject=doc_name, setting=get_setting('wiki'),
                                    sidebar_list=sidebar_list, nav={'document': False})
         else:
             text = text['html_data']
             return render_template('document/view.html', subject=doc_name, text=text, setting=get_setting('wiki'),
                                    sidebar_list=sidebar_list, nav={'document': True})
+
+    # 문서 검색 기능
+    @app.route('/search/<path:text>')
+    def doc_search(text):
+        return 'not now'
+
     # 문서 부가 기능
     @app.route('/history/<path:doc_name>')
     def doc_history(doc_name):
         db = database.get_db()
-        doc_id = db.execute("SELECT id FROM docs_list WHERE name=?", (doc_name,)).fetchone()
+        doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()
 
         if doc_id is not None:
             doc_id = doc_id['id']
@@ -107,7 +128,7 @@ def create_app(test_config=None):
     @app.route('/markdown/<path:doc_name>')
     def doc_markdown(doc_name):
         db = database.get_db()
-        doc_id = db.execute("SELECT id FROM docs_list WHERE name=?", (doc_name,)).fetchone()
+        doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()
 
         if doc_id is not None:
             doc_id = doc_id['id']
@@ -124,7 +145,7 @@ def create_app(test_config=None):
     @app.route('/random')
     def random():
         db = database.get_db()
-        doc_name = db.execute("SELECT name FROM docs_list ORDER BY RANDOM() LIMIT 1").fetchone()
+        doc_name = db.execute("SELECT name FROM doc_list ORDER BY RANDOM() LIMIT 1").fetchone()
         if doc_name:
             doc_name = doc_name['name']
             return redirect("/docs/{0}".format(doc_name), code=302)
@@ -136,10 +157,13 @@ def create_app(test_config=None):
     # 문서 쓰기
     @app.route('/edit/<path:doc_name>')
     def doc_write(doc_name):
+        if not is_doc_name(doc_name):
+            return error_page('incorrect_doc')
+
         sidebar_list = get_current_list()
 
         db = database.get_db()
-        doc_id = db.execute("SELECT id FROM docs_list WHERE name = ?", (doc_name,)).fetchone()
+        doc_id = db.execute("SELECT id FROM doc_list WHERE name = ?", (doc_name,)).fetchone()
         if doc_id is not None:  # 있는 글을 편집함.
             text = db.execute("SELECT markdown_data FROM history WHERE id = ? order by version DESC LIMIT 1",
                               (doc_id['id'],)).fetchone()
@@ -159,8 +183,11 @@ def create_app(test_config=None):
 
     @app.route('/save/<path:doc_name>', methods=['post'])
     def doc_save(doc_name):
+        if not is_doc_name(doc_name):
+            return error_page('incorrect_doc')
+
         db = database.get_db()
-        doc_id = db.execute("SELECT id FROM docs_list WHERE name=?", (doc_name,)).fetchone()
+        doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()
         if doc_id is not None:
             doc_id = doc_id['id']
             is_edit = True
@@ -172,15 +199,15 @@ def create_app(test_config=None):
         html_text = translator.compile()
 
         if not is_edit:
-            id = db.execute("SELECT max(id) FROM docs_list").fetchone()['max(id)']
+            id = db.execute("SELECT max(id) FROM doc_list").fetchone()['max(id)']
             if id is None:
                 id = 0
             id += 1
-            docs_list_list = (id, doc_name)
-            docs_list = (id, html_text)
+            doc_list_list = (id, doc_name)
+            doc_list = (id, html_text)
             history_list = (id, 1, markdown_text)
-            db.execute("INSERT into docs_list VALUES(?, ?, datetime('now', 'localtime'))", docs_list_list)
-            db.execute("INSERT into docs VALUES(?, ?)", docs_list)
+            db.execute("INSERT into doc_list VALUES(?, ?, datetime('now', 'localtime'))", doc_list_list)
+            db.execute("INSERT into docs VALUES(?, ?)", doc_list)
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
             db.commit()
             return redirect("/docs/{0}".format(doc_name), code=302)
@@ -200,8 +227,8 @@ def create_app(test_config=None):
             db = database.get_db()
             # 으악... 캐스트 캐이드를 디비 열 때마다 켜줘야 한다는데, 파이썬으로는 조작도 안되고.. 허;;
             # 일일이 지우는 수 밖에;;
-            doc_id = db.execute("SELECT id FROM docs_list WHERE name=?", (doc_name,)).fetchone()['id']
-            db.execute("DELETE FROM docs_list WHERE id=?", (doc_id,))
+            doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()['id']
+            db.execute("DELETE FROM doc_list WHERE id=?", (doc_id,))
             db.execute("DELETE FROM docs WHERE id=?", (doc_id,))
             db.execute("DELETE FROM history WHERE id=?", (doc_id,))
             db.commit()
@@ -214,11 +241,17 @@ def create_app(test_config=None):
     # 파일 업로드
     @app.route('/upload/<path:doc_name>')
     def file_upload(doc_name):
+        if not is_doc(doc_name):
+            return error_page('not_such_doc')
+
         sidebar_list = get_current_list()
         return render_template('document/file_upload.html', setting=get_setting('wiki'), subject=doc_name, sidebar_list=sidebar_list, nav={'document': False})
 
     @app.route('/upload', methods=['post'])
     def upload():
+        if not is_doc(request.form['doc_name']):
+            return error_page('not_such_doc')
+
         upload_folder = 'uploads/' + request.form['doc_name'] + '/'
 
         allowed_extensions = ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3']
@@ -238,7 +271,7 @@ def create_app(test_config=None):
 
         # 해당 문서가 있는지 검사함
         db = database.get_db()
-        if not db.execute('SELECT * FROM docs_list WHERE name=?', (request.form['doc_name'],)):
+        if not db.execute('SELECT * FROM doc_list WHERE name=?', (request.form['doc_name'],)):
             return 'errr'
 
         if file and '.' in file.filename:

@@ -12,7 +12,7 @@ CREATE TABLE user(
   PRIMARY KEY (id)
 );
 
-CREATE TABLE docs_list(
+CREATE TABLE doc_list(
   id integer,
   name text,
   date numeric,
@@ -22,7 +22,8 @@ CREATE TABLE docs_list(
 CREATE TABLE docs(
   id integer,
   html_data text,
-  PRIMARY KEY (id)
+  markdown_data text,
+  PRIMARY KEY (id),
   FOREIGN KEY (id) REFERENCES docs_list(id)
 );
 
