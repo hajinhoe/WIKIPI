@@ -1,0 +1,27 @@
+.tab-pane ul{
+    border-left: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px;
+}
+
+.tab-pane li{
+    display: inline-block;
+    margin: 5px;
+}
+
+#list_bar {
+    text-align: center;
+}
+
+#list_bar nav {
+    display: inline-block;
+}
+
+#list_body ul li {
+    list-style: square;
+}
+
+#list_body ul {
+    padding: 10px 0 0 30px;
+}

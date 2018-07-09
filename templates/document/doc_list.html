@@ -1,0 +1,117 @@
+{%  extends 'layout.html' %}
+
+{% block navbar_brand %}
+    문서 일람
+{% endblock %}
+{%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/doc_list.css') }}">
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{%  block title %}
+    <title>문서 일람 - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block section %}
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#recent" role="tab" aria-controls="recent" aria-selected="true">날짜별로</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#hanguel" role="tab" aria-controls="hanguel" aria-selected="false">한글자모</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#romaja" role="tab" aria-controls="romaja" aria-selected="false">로마자 및 기타</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="recent" role="tabpanel" aria-labelledby="recent-tab">
+            <ul>
+                <li><a href="{{ url_for('doc_list', method='recent_write') }}">최근에 작성</a></li>
+                <li><a href="{{ url_for('doc_list', method='recent_edit') }}">최근에 수정</a></li>
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="hanguel" role="tabpanel" aria-labelledby="hanguel-tab">
+            <ul>
+                <li><a href="{{ url_for('doc_list', method='가', page_number=1) }}">ㄱ/ㄲ</a></li>
+                <li><a href="{{ url_for('doc_list', method='나', page_number=1) }}">ㄴ</a></li>
+                <li><a href="{{ url_for('doc_list', method='다', page_number=1) }}">ㄷ/ㄸ</a></li>
+                <li><a href="{{ url_for('doc_list', method='라', page_number=1) }}">ㄹ</a></li>
+                <li><a href="{{ url_for('doc_list', method='마', page_number=1) }}">ㅁ</a></li>
+                <li><a href="{{ url_for('doc_list', method='바', page_number=1) }}">ㅂ/ㅃ</a></li>
+                <li><a href="{{ url_for('doc_list', method='사', page_number=1) }}">ㅅ/ㅆ</a></li>
+                <li><a href="{{ url_for('doc_list', method='아', page_number=1) }}">ㅇ</a></li>
+                <li><a href="{{ url_for('doc_list', method='자', page_number=1) }}">ㅈ/ㅉ</a></li>
+                <li><a href="{{ url_for('doc_list', method='차', page_number=1) }}">ㅊ</a></li>
+                <li><a href="{{ url_for('doc_list', method='카', page_number=1) }}">ㅋ</a></li>
+                <li><a href="{{ url_for('doc_list', method='타', page_number=1) }}">ㅌ</a></li>
+                <li><a href="{{ url_for('doc_list', method='파', page_number=1) }}">ㅍ</a></li>
+                <li><a href="{{ url_for('doc_list', method='하', page_number=1) }}">ㅎ</a></li>
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="romaja" role="tabpanel" aria-labelledby="romaja-tab">
+            <ul>
+                <li><a href="{{ url_for('doc_list', method='a', page_number=1) }}">A</a></li>
+                <li><a href="{{ url_for('doc_list', method='b', page_number=1) }}">B</a></li>
+                <li><a href="{{ url_for('doc_list', method='c', page_number=1) }}">C</a></li>
+                <li><a href="{{ url_for('doc_list', method='d', page_number=1) }}">D</a></li>
+                <li><a href="{{ url_for('doc_list', method='e', page_number=1) }}">E</a></li>
+                <li><a href="{{ url_for('doc_list', method='f', page_number=1) }}">F</a></li>
+                <li><a href="{{ url_for('doc_list', method='g', page_number=1) }}">G</a></li>
+                <li><a href="{{ url_for('doc_list', method='h', page_number=1) }}">H</a></li>
+                <li><a href="{{ url_for('doc_list', method='i', page_number=1) }}">I</a></li>
+                <li><a href="{{ url_for('doc_list', method='j', page_number=1) }}">J</a></li>
+                <li><a href="{{ url_for('doc_list', method='k', page_number=1) }}">K</a></li>
+                <li><a href="{{ url_for('doc_list', method='l', page_number=1) }}">L</a></li>
+                <li><a href="{{ url_for('doc_list', method='m', page_number=1) }}">M</a></li>
+                <li><a href="{{ url_for('doc_list', method='n', page_number=1) }}">N</a></li>
+                <li><a href="{{ url_for('doc_list', method='o', page_number=1) }}">O</a></li>
+                <li><a href="{{ url_for('doc_list', method='p', page_number=1) }}">P</a></li>
+                <li><a href="{{ url_for('doc_list', method='q', page_number=1) }}">Q</a></li>
+                <li><a href="{{ url_for('doc_list', method='r', page_number=1) }}">R</a></li>
+                <li><a href="{{ url_for('doc_list', method='s', page_number=1) }}">S</a></li>
+                <li><a href="{{ url_for('doc_list', method='t', page_number=1) }}">T</a></li>
+                <li><a href="{{ url_for('doc_list', method='u', page_number=1) }}">U</a></li>
+                <li><a href="{{ url_for('doc_list', method='v', page_number=1) }}">V</a></li>
+                <li><a href="{{ url_for('doc_list', method='w', page_number=1) }}">W</a></li>
+                <li><a href="{{ url_for('doc_list', method='x', page_number=1) }}">X</a></li>
+                <li><a href="{{ url_for('doc_list', method='y', page_number=1) }}">Y</a></li>
+                <li><a href="{{ url_for('doc_list', method='z', page_number=1) }}">Z</a></li>
+                <li><a href="{{ url_for('doc_list', method='special', page_number=1) }}">특수문자</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="list_body">
+        <h1>{{ method_print }}</h1>
+        {% if list %}
+        <ul>
+            {% for element in list %}
+            <li><a href="{{ url_for('doc_request', doc_name=element['name']) }}">{{ element['name'] }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>데이터가 없습니다.</p>
+        {% endif %}
+    </div>
+    <div id="list_bar">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item {% if page_number == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">이전</span>
+                    </a>
+                </li>
+                {% for page in page_numbers %}
+                <li class="page-item {% if page == page_number %}disabled{% endif %}"><a class="page-link" href="{{ url_for('doc_list',method=method, page_number=page) }}">{{ page }}</a></li>
+                {% endfor %}
+                <li class="page-item {% if page_number == last_page %}disabled{% endif %}">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">다음</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

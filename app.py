@@ -64,7 +64,7 @@ def create_app(test_config=None):
     def is_doc_name(name): # 문서의 이름이 올바른지 검사함
         if re.search('[/ ]{2,}', name):
             return False
-        if re.search('^[^/ ].+[^/ ]$', name):
+        if re.search('^(?! ).+(?<!/| )$', name):
             return True
         return False
 
@@ -80,17 +80,17 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         if get_setting('app')['install']:
-            return redirect('/docs/{0}'.format(get_setting('wiki')['main']), code=302)
+            return redirect('/doc/{0}'.format(get_setting('wiki')['main']), code=302)
         else:
             return redirect('/setting/install', code=302)
 
-    @app.route('/docs/<path:doc_name>')
+    @app.route('/doc/<path:doc_name>')
     def doc_request(doc_name):
         db = database.get_db()
 
         name = (doc_name,)
-        text = db.execute("SELECT html_data FROM docs join doc_list using (id) WHERE name = ?", name).fetchone()
-        a = db.execute("SELECT * FROM docs").fetchone()
+        text = db.execute("SELECT html_data FROM doc join doc_list using (id) WHERE name = ?", name).fetchone()
+        a = db.execute("SELECT * FROM doc").fetchone()
 
         sidebar_list = get_current_list()
 
@@ -101,6 +101,68 @@ def create_app(test_config=None):
             text = text['html_data']
             return render_template('document/view.html', subject=doc_name, text=text, setting=get_setting('wiki'),
                                    sidebar_list=sidebar_list, nav={'document': True})
+
+    # 문서 리스트 보기
+    @app.route('/docs', methods=['get'])
+    def doc_list():
+        method_display = {"recent_write": "최근에 작성한 순서", "recent_edit": "최근에 수정한 순서",
+                          "가": "ㄱ/ㄲ", "나": "ㄴ", "다": "ㄷ", "라": "ㄹ", "마": "ㅁ", "바": "ㅂ/ㅃ",
+                          "사": "ㅅ/ㅆ", "아": "ㅇ", "자": "ㅈ/ㅉ", "차": "ㅊ", "카": "ㅋ", "타": "ㅌ",
+                          "파": "ㅍ", "하": "ㅎ", "a": "A", "b": "B", "c": "C", "d":"D", "e": "E",
+                          "f": "F", "g": "G", "h": "H", "i": "I", "j": "J", "k": "K", "l": "L",
+                          "m": "M", "n": "N", "o": "O", "p": "P", "q": "Q", "r": "R", "s": "S",
+                          "t": "T", "u": "U", "v": "V", "w": "W", "x": "X", "y": "Y", "z": "Z",
+                          "special": "특수문자"}
+        hanguel = ['가','나','다','라','마','바','사','아','자','타','카','타','파','하', '힣']
+        if not request.args.get('method'):
+            method = 'recent_write'
+        else:
+            method = request.args.get('method')
+        if not request.args.get('page_number'):
+            page_number = 1
+        else:
+            page_number = int(request.args.get('page_number'))
+        limit_point = (page_number - 1) * 30
+        db = database.get_db()
+        if method == 'recent_write':
+            count = db.execute("SELECT count(*) as count FROM doc_list").fetchone()['count']
+            list_data = db.execute("SELECT name FROM doc_list ORDER BY datetime(date) DESC LIMIT ? OFFSET ?", (30, limit_point))
+        elif method == 'recent_edit':
+            count = db.execute("SELECT count(*) as count FROM history").fetchone()['count']
+            list_data = db.execute("SELECT name FROM (history join doc_list using (id)) as t ORDER BY datetime(t.date) DESC LIMIT ? OFFSET ?", (30, limit_point))
+        elif method in hanguel: # 한글 일 경우
+            start = hanguel.index(method)
+            end = start + 1
+            if method == '하': # 마지막일 경우
+                count = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name <= ?", (hanguel[start], hanguel[end])).fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name <= ? LIMIT ? OFFSET ?", (hanguel[start], hanguel[end], 30, limit_point))
+            else:
+                count = list_data = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name < ?", (hanguel[start], hanguel[end])).fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name < ? LIMIT ? OFFSET ?", (hanguel[start], hanguel[end], 30, limit_point))
+        else: #영문 또는 기타 문자임
+            if method == 'special':
+                count = db.execute("SELECT count(*) as count FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z'").fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z') LIMIT ? OFFSET ?", (30, limit_point))
+            else:
+                statement = method + '%'
+                count = db.execute("SELECT count(*) as count FROM doc_list WHERE LOWER(name) LIKE ?", (statement,)).fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE LOWER(name) LIKE ? LIMIT ? OFFSET ?", (statement, 30, limit_point))
+
+        page_numbers = []
+        if count % 30 == 0:
+            last_page = int(count / 30)
+        else:
+            last_page = int(count / 30) + 1
+        for number in range(-4, 4):
+            if 0 < page_number + number <= last_page:
+                page_numbers.append(page_number + number)
+
+        if list_data is not None:
+            list_data = list_data.fetchall()
+
+        return render_template('document/doc_list.html', setting=get_setting('wiki'), sidebar_list=get_current_list(),
+                               nav={'document': False}, method=method, method_print=method_display[method],
+                               list = list_data, page_numbers=page_numbers, page_number=page_number, last_page=last_page)
 
     # 문서 검색 기능
     @app.route('/search/<path:text>')
@@ -148,7 +210,7 @@ def create_app(test_config=None):
         doc_name = db.execute("SELECT name FROM doc_list ORDER BY RANDOM() LIMIT 1").fetchone()
         if doc_name:
             doc_name = doc_name['name']
-            return redirect("/docs/{0}".format(doc_name), code=302)
+            return redirect("/doc/{0}".format(doc_name), code=302)
         else:
             sidebar_list = get_current_list()
             return render_template('error/404.html', setting=get_setting('wiki'), sidebar_list=sidebar_list,
@@ -204,21 +266,21 @@ def create_app(test_config=None):
                 id = 0
             id += 1
             doc_list_list = (id, doc_name)
-            doc_list = (id, html_text)
+            doc_list = (id, html_text, markdown_text)
             history_list = (id, 1, markdown_text)
             db.execute("INSERT into doc_list VALUES(?, ?, datetime('now', 'localtime'))", doc_list_list)
-            db.execute("INSERT into docs VALUES(?, ?)", doc_list)
+            db.execute("INSERT into doc VALUES(?, ?, ?)", doc_list)
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
             db.commit()
-            return redirect("/docs/{0}".format(doc_name), code=302)
+            return redirect("/doc/{0}".format(doc_name), code=302)
         else:
             history_version = db.execute("SELECT max(version) FROM history where id = ?",
                                          (doc_id,)).fetchone()['max(version)'] + 1
             history_list = (doc_id, history_version, markdown_text)
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
-            db.execute("UPDATE docs SET html_data = ? WHERE id = ?", (html_text, doc_id))
+            db.execute("UPDATE doc SET html_data = ? WHERE id = ?", (html_text, doc_id))
             db.commit()
-            return redirect("/docs/{0}".format(doc_name), code=302)
+            return redirect("/doc/{0}".format(doc_name), code=302)
 
     # 문서 지우기
     @app.route('/remove/<path:doc_name>')
@@ -229,7 +291,7 @@ def create_app(test_config=None):
             # 일일이 지우는 수 밖에;;
             doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()['id']
             db.execute("DELETE FROM doc_list WHERE id=?", (doc_id,))
-            db.execute("DELETE FROM docs WHERE id=?", (doc_id,))
+            db.execute("DELETE FROM doc WHERE id=?", (doc_id,))
             db.execute("DELETE FROM history WHERE id=?", (doc_id,))
             db.commit()
             return redirect('/', code=302)
@@ -397,13 +459,15 @@ def create_app(test_config=None):
     # 에러 관련 페이지
     @app.route('/error')
     def error_page(error):
-        return render_template('error/error.html', error=error, setting=get_setting('wiki'), sidebar_list=get_current_list(), nav={'document': False})
+        return render_template('error/error.html', error=error, setting=get_setting('wiki'),
+                               sidebar_list=get_current_list(), nav={'document': False})
 
     @app.errorhandler(500)
     @app.errorhandler(404)
     def page_not_found(e):
         sidebar_list = get_current_list()
-        return render_template('error/404.html', setting=get_setting('wiki'), sidebar_list=sidebar_list, nav={'document': False})
+        return render_template('error/404.html', setting=get_setting('wiki'),
+                               sidebar_list=sidebar_list, nav={'document': False})
 
     return app
 

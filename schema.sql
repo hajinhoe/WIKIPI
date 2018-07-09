@@ -19,7 +19,7 @@ CREATE TABLE doc_list(
   PRIMARY KEY (id)
 );
 
-CREATE TABLE docs(
+CREATE TABLE doc(
   id integer,
   html_data text,
   markdown_data text,
