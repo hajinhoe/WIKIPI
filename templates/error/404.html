@@ -1,17 +1,23 @@
-{%  extends 'layout.html' %}
-
-{% block navbar_brand %}
-    에러
-{% endblock %}
-{%  block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='document.css') }}">
-{%  endblock %}
-{%  block javascript %}
-{%  endblock %}
-{%  block title %}
+<!doctype html>
+<html lang="ko">
+<head>
     <title>에러 - {{ setting['name'] }}</title>
-{%  endblock %}
-{% block section %}
-    <h1>정상적이지 않은 접근입니다.</h1>
-    <p>페이지의 주소가 올바른지 확인하십시오.</p>
-{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- External Module CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='module/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='module/fontawesome/css/all.css') }}">
+    <!-- required CSS for page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <!-- External Module JS -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="{{ url_for('static', filename='module/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='module/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='module/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- required JS for page -->
+</head>
+<body>
+    <h1>페이지를 찾을 수 없습니다.</h1>
+    <p>페이지의 주소를 확인하세요.</p>
+</body>
+</html>

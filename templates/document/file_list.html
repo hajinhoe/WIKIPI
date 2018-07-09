@@ -11,7 +11,7 @@
     {{ subject }}
 {% endblock %}
 {% block section %}
-    <a href="/edit/{{ subject }}">편집로 가기</a>
+    <a href="/edit/{{ subject }}">편집기로 가기</a>
     <ul>
         {% for file in file_list %}
         <li><a href="/file/{{ subject }}/{{ file }}">[파일:{{ subject }}/{{ file }}]</a></li>
