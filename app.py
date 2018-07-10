@@ -1,7 +1,7 @@
 import os
-import secrets
 import bcrypt
 import re
+from base64 import b64encode
 
 from flask import Flask, render_template, request,\
     jsonify, redirect, session, url_for, flash,\
@@ -23,7 +23,7 @@ def create_app(test_config=None):
 
         app_config = tools.Config('config/app')
         if not app_config.exist():
-            app_config.save({"install": False, "secret_key": secrets.token_hex(16)})
+            app_config.save({"install": False, "secret_key": b64encode(os.urandom(64)).decode('utf8')})
             database.init_db()
 
         secret_key = app_config.load()['secret_key']
