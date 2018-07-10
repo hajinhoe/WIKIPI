@@ -1,0 +1,51 @@
+{%  extends 'layout.html' %}
+
+{% block navbar_brand %}
+    {{ subject }}
+{% endblock %}
+{%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{%  block title %}
+    <title>{{ subject }} (찾는 중) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block section %}
+    <div id="search_body">
+        <div>
+        <h1>검색 결과</h1>
+        </div>
+        <div id="contents">
+        <h2>제목이 정확함</h2>
+        {% if result["same_name"] %}
+            <ul>
+                <li><a href="{{ url_for('doc_request', doc_name=subject) }}">{{ subject }}</a></li>
+            </ul>
+        {% else %}
+        <p>{{ subject }} 문서가 없습니다. <a href="{{ url_for('doc_write', doc_name=subject) }}">문서를 만들까요?</a></p>
+        {% endif %}
+        <h2>제목에 포함됨</h2>
+        {% if result["included_in_name"] %}
+        <ul>
+        {% for element in result["included_in_name"] %}
+            <li><a href="{{ url_for('doc_request', doc_name=element) }}">{{ element }}</a></li>
+        {% endfor %}
+        </ul>
+        {% else %}
+        <p>검색된 결과가 없습니다.</p>
+        {% endif %}
+        <h2>내용에 포함됨</h2>
+        {% if result["included_in_text"] %}
+        <dl>
+        {% for name in result["included_in_text"].keys() %}
+            <dt><a href="{{ url_for('doc_request', doc_name=name) }}">{{ name }}</a></dt>
+            <dd>{{ result["included_in_text"][name] }}</dd>
+        {% endfor %}
+        </dl>
+        {% else %}
+        <p>검색된 결과가 없습니다.</p>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

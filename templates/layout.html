@@ -68,7 +68,7 @@
             </div>
             <div id="nav_bar" class="col">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                    <a class="navbar-brand" href="/docs/{% if subject %}{{ subject }}{% else %}#{% endif %}">{% block navbar_brand %}{% endblock %}</a>
+                    <a class="navbar-brand" href="{% if subject %}{{ url_for('doc_request', doc_name=subject) }}{% else %}#{% endif %}">{% block navbar_brand %}{% endblock %}</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -113,11 +113,11 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     {% if 'id' in session %}
                                     <a class="dropdown-item" href="{{ url_for('logout') }}">로그아웃</a>
-                                    <a class="dropdown-item" href="/setting/user">유저정보</a>
+                                    <a class="dropdown-item" href="{{ url_for('set_user') }}">유저정보</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/setting/blog">관리</a>
+                                    <a class="dropdown-item" href="{{ url_for('set_blog') }}">관리</a>
                                     {% else %}
-                                    <a class="dropdown-item" href="/login">로그인</a>
+                                    <a class="dropdown-item" href="{{ url_for('login') }}">로그인</a>
                                     {% endif %}
                                 </div>
                             </li>
@@ -153,22 +153,22 @@
             </div>
 <script>
     $("#side_search button").on("click", function () {
-        window.location.replace("/docs/" + $("#side_search input").val());
+        window.location.replace("/search/" + $("#side_search input").val());
     });
 
     $("#side_search input").on("keypress", function (e) {
         if(e.keyCode == 13) {
-            window.location.replace("/docs/" + $("#side_search input").val());
+            window.location.replace("/search/" + $("#side_search input").val());
         }
     });
 
     $("#navbar_search button").on("click", function () {
-        window.location.replace("/docs/" + $("#navbar_search input").val());
+        window.location.replace("/search/" + $("#navbar_search input").val());
     });
 
     $("#navbar_search input").on("keypress", function (e) {
         if(e.keyCode == 13) {
-            window.location.replace("/docs/" + $("#navbar_search input").val());
+            window.location.replace("/search/" + $("#navbar_search input").val());
         }
     });
 </script>

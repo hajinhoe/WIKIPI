@@ -88,19 +88,15 @@ def create_app(test_config=None):
     def doc_request(doc_name):
         db = database.get_db()
 
-        name = (doc_name,)
-        text = db.execute("SELECT html_data FROM doc join doc_list using (id) WHERE name = ?", name).fetchone()
-        a = db.execute("SELECT * FROM doc").fetchone()
-
-        sidebar_list = get_current_list()
+        text = db.execute("SELECT html_data FROM doc join doc_list using (id) WHERE name = ?", (doc_name,)).fetchone()
 
         if text is None:
             return render_template('document/not_such_doc.html', subject=doc_name, setting=get_setting('wiki'),
-                                   sidebar_list=sidebar_list, nav={'document': False})
+                                   sidebar_list=get_current_list(), nav={'document': False})
         else:
             text = text['html_data']
             return render_template('document/view.html', subject=doc_name, text=text, setting=get_setting('wiki'),
-                                   sidebar_list=sidebar_list, nav={'document': True})
+                                   sidebar_list=get_current_list(), nav={'document': True})
 
     # 문서 리스트 보기
     @app.route('/docs', methods=['get'])
@@ -134,15 +130,21 @@ def create_app(test_config=None):
             start = hanguel.index(method)
             end = start + 1
             if method == '하': # 마지막일 경우
-                count = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name <= ?", (hanguel[start], hanguel[end])).fetchone()['count']
-                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name <= ? LIMIT ? OFFSET ?", (hanguel[start], hanguel[end], 30, limit_point))
+                count = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name <= ?",
+                                   (hanguel[start], hanguel[end])).fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name <= ? LIMIT ? OFFSET ?",
+                                       (hanguel[start], hanguel[end], 30, limit_point))
             else:
-                count = list_data = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name < ?", (hanguel[start], hanguel[end])).fetchone()['count']
-                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name < ? LIMIT ? OFFSET ?", (hanguel[start], hanguel[end], 30, limit_point))
+                count = list_data = db.execute("SELECT count(*) as count FROM doc_list WHERE name >= ? and name < ?",
+                                               (hanguel[start], hanguel[end])).fetchone()['count']
+                list_data = db.execute("SELECT name FROM doc_list WHERE name >= ? and name < ? LIMIT ? OFFSET ?",
+                                       (hanguel[start], hanguel[end], 30, limit_point))
         else: #영문 또는 기타 문자임
             if method == 'special':
-                count = db.execute("SELECT count(*) as count FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z'").fetchone()['count']
-                list_data = db.execute("SELECT name FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z') LIMIT ? OFFSET ?", (30, limit_point))
+                count =\
+                    db.execute("SELECT count(*) as count FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z'").fetchone()['count']
+                list_data =\
+                    db.execute("SELECT name FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z') LIMIT ? OFFSET ?", (30, limit_point))
             else:
                 statement = method + '%'
                 count = db.execute("SELECT count(*) as count FROM doc_list WHERE LOWER(name) LIKE ?", (statement,)).fetchone()['count']
@@ -162,12 +164,42 @@ def create_app(test_config=None):
 
         return render_template('document/doc_list.html', setting=get_setting('wiki'), sidebar_list=get_current_list(),
                                nav={'document': False}, method=method, method_print=method_display[method],
-                               list = list_data, page_numbers=page_numbers, page_number=page_number, last_page=last_page)
+                               list=list_data, page_numbers=page_numbers, page_number=page_number, last_page=last_page)
 
     # 문서 검색 기능
     @app.route('/search/<path:text>')
     def doc_search(text):
-        return 'not now'
+        search_result = {"same_name": False, "included_in_name": [], "included_in_text": {}}
+        # 문서 제목과 정확히 일치
+        db = database.get_db()
+        result = db.execute("SELECT name FROM doc_list WHERE name = ?", (text,)).fetchone()
+        if result is not None:
+            search_result["same_name"] = True
+        # 문서 제목에 검색어가 포함됨
+        query_items = text.split(" ", maxsplit=5)
+        for item in query_items:
+            results = \
+                db.execute("SELECT name FROM doc_list WHERE name like ?", ("%" + item + "%",)).fetchall()
+            if results is not None:
+                for result in results:
+                    if result['name'] not in search_result["included_in_name"]:
+                        search_result["included_in_name"].append(result['name'])
+        # 문서 내용에 검색어가 포함됨
+        search_text = text.replace(" ", "|")
+        for item in query_items:
+            results = \
+                db.execute(
+                    "SELECT name, markdown_data FROM (doc_list join doc using (id)) as t WHERE t.markdown_data like ?",
+                    ("%" + item + "%",)).fetchall()
+            if results is not None:
+                for result in results:
+                    if result['name'] not in search_result["included_in_text"]:
+                        search_result["included_in_text"][result['name']] = ""
+                        re_data = re.findall('.*?(({0}).{{0,20}})+.*?'.format(search_text), result['markdown_data'])
+                        for data in re_data:
+                            search_result["included_in_text"][result['name']] += " " + data[0]
+        return render_template('document/doc_search.html', subject=text, setting=get_setting('wiki'),
+                               sidebar_list=get_current_list(), nav={'document': False}, result=search_result)
 
     # 문서 부가 기능
     @app.route('/history/<path:doc_name>')
@@ -217,10 +249,12 @@ def create_app(test_config=None):
                                    nav={'document': False})
 
     # 문서 쓰기
-    @app.route('/edit/<path:doc_name>')
+    @app.route('/write/<path:doc_name>')
     def doc_write(doc_name):
         if not is_doc_name(doc_name):
             return error_page('incorrect_doc')
+        if 'id' not in session:
+            return error_page('not_login')
 
         sidebar_list = get_current_list()
 
@@ -247,6 +281,8 @@ def create_app(test_config=None):
     def doc_save(doc_name):
         if not is_doc_name(doc_name):
             return error_page('incorrect_doc')
+        if 'id' not in session:
+            return error_page('not_login')
 
         db = database.get_db()
         doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()
@@ -296,15 +332,15 @@ def create_app(test_config=None):
             db.commit()
             return redirect('/', code=302)
         else:
-            sidebar_list = get_current_list()
-            return render_template('error/404.html', setting=get_setting('wiki'), sidebar_list=sidebar_list,
-                                   nav={'document': False})
+            return error_page('not_login')
 
     # 파일 업로드
     @app.route('/upload/<path:doc_name>')
     def file_upload(doc_name):
         if not is_doc(doc_name):
             return error_page('not_such_doc')
+        if 'id' not in session:
+            return error_page('not_login')
 
         sidebar_list = get_current_list()
         return render_template('document/file_upload.html', setting=get_setting('wiki'), subject=doc_name, sidebar_list=sidebar_list, nav={'document': False})
@@ -313,6 +349,8 @@ def create_app(test_config=None):
     def upload():
         if not is_doc(request.form['doc_name']):
             return error_page('not_such_doc')
+        if 'id' not in session:
+            return error_page('not_login')
 
         upload_folder = 'uploads/' + request.form['doc_name'] + '/'
 
@@ -370,11 +408,15 @@ def create_app(test_config=None):
     # 설정 관련 페이지
     @app.route('/setting/blog')
     def set_blog():
+        if 'id' not in session:
+            return error_page('not_login')
         sidebar_list = get_current_list()
         return render_template('admin/set_blog.html', setting=get_setting('wiki'), sidebar_list=sidebar_list, nav={'document': False})
 
     @app.route('/setting/blog/save', methods=['post'])
     def set_blog_save():
+        if 'id' not in session:
+            return error_page('not_login')
         sidebar_list = get_current_list()
         data = {"name": request.form['name'], "information": request.form['information'],
                 "main": request.form['main'], "disqus_url": request.form['disqus_url'],
@@ -384,6 +426,8 @@ def create_app(test_config=None):
 
     @app.route('/setting/user')
     def set_user():
+        if 'id' not in session:
+            return error_page('not_login')
         sidebar_list = get_current_list()
         db = database.get_db()
         user = db.execute("SELECT * FROM user WHERE id=?", (session['id'],)).fetchone()
@@ -391,6 +435,8 @@ def create_app(test_config=None):
 
     @app.route('/setting/user/save', methods=['post'])
     def set_user_save():
+        if 'id' not in session:
+            return error_page('not_login')
         db = database.get_db()
         password = request.form['pw'].encode('utf8')
         hashed_password = bcrypt.hashpw(password, bcrypt.gensalt(14))
@@ -414,6 +460,7 @@ def create_app(test_config=None):
         password = request.form['pw'].encode('utf8')
         hashed_password = db.execute("SELECT password FROM user WHERE id = ?",(request.form['id'],)).fetchone()['password']
         if bcrypt.checkpw(password, hashed_password):
+            session.permanent = False
             session["id"] = request.form['id']
             return redirect('/', code=302)
         else:

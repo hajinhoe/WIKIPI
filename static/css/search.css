@@ -1,0 +1,26 @@
+#search_body h1 {
+    font-size: 42px;
+    margin: 10px 10px 10px 0px;
+}
+
+#search_body #contents {
+    padding-left: 20px;
+}
+
+#search_body p {
+    font-size: 20px;
+}
+
+#search_body #contents ul li {
+    font-size: 20px;
+    list-style: square;
+}
+
+#search_body #contents dt {
+    font-size: 20px;
+}
+
+#search_body #contents dd {
+    background-color: #f8f9fa;
+    padding: 10px;
+}
