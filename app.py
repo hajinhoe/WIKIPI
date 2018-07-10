@@ -314,7 +314,7 @@ def create_app(test_config=None):
                                          (doc_id,)).fetchone()['max(version)'] + 1
             history_list = (doc_id, history_version, markdown_text)
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
-            db.execute("UPDATE doc SET html_data = ? and markdown_data = ? WHERE id = ?", (html_text, markdown_text, doc_id))
+            db.execute("UPDATE doc SET html_data = ?, markdown_data = ? WHERE id = ?", (html_text, markdown_text, doc_id))
             db.commit()
             return redirect("/doc/{0}".format(doc_name), code=302)
 
