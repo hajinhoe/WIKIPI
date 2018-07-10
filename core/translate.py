@@ -324,6 +324,10 @@ class Translator:
                                                             .format(index_number[0], index_number[1], index_number[2],
                                                                     index_number[3], index_number[4], index_number[5],
                                                                     subject=h6_element)
+                                            index_number = [index_number[0], index_number[1], index_number[2], index_number[3], index_number[4], 0]
+                                    index_number = [index_number[0], index_number[1], index_number[2], index_number[3], 0, 0]
+                            index_number = [index_number[0], index_number[1], index_number[2], 0, 0, 0]
+                    index_number = [index_number[0], index_number[1], 0, 0, 0, 0]
             index_number = [index_number[0], 0, 0, 0, 0, 0]
         string += "</div>"
         return string
