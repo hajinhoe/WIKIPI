@@ -142,7 +142,7 @@ def create_app(test_config=None):
         else: #영문 또는 기타 문자임
             if method == 'special':
                 count =\
-                    db.execute("SELECT count(*) as count FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z'").fetchone()['count']
+                    db.execute("SELECT count(*) as count FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z')").fetchone()['count']
                 list_data =\
                     db.execute("SELECT name FROM doc_list WHERE not (name >= '가' and name <= '힣') and not (LOWER(name) >= 'a' and LOWER(name) <= 'z') LIMIT ? OFFSET ?", (30, limit_point))
             else:
@@ -195,7 +195,7 @@ def create_app(test_config=None):
                 for result in results:
                     if result['name'] not in search_result["included_in_text"]:
                         search_result["included_in_text"][result['name']] = ""
-                        re_data = re.findall('.*?(({0}).{{0,20}})+.*?'.format(search_text), result['markdown_data'])
+                        re_data = re.findall('(.{{0,50}}({0}).{{0,50}})+'.format(search_text), result['markdown_data'])
                         for data in re_data:
                             search_result["included_in_text"][result['name']] += " " + data[0]
         return render_template('document/doc_search.html', subject=text, setting=get_setting('wiki'),
@@ -458,7 +458,13 @@ def create_app(test_config=None):
     def login_session():
         db = database.get_db()
         password = request.form['pw'].encode('utf8')
-        hashed_password = db.execute("SELECT password FROM user WHERE id = ?",(request.form['id'],)).fetchone()['password']
+        hashed_password = db.execute("SELECT password FROM user WHERE id = ?",(request.form['id'],)).fetchone()
+
+        if hashed_password is not None:
+            hashed_password = hashed_password['password']
+        else:
+            return error_page('login')
+
         if bcrypt.checkpw(password, hashed_password):
             session.permanent = False
             session["id"] = request.form['id']

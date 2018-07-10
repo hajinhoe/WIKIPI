@@ -257,9 +257,9 @@ class Translator:
                         line = expression.sub('<a href="\g<link>">\g<link></a>', line)
                 else:
                     if searched_line.group('title') is not None:
-                        line = expression.sub('<a href="/docs/\g<link>">\g<title></a>', line)
+                        line = expression.sub('<a href="/doc/\g<link>">\g<title></a>', line)
                     else:
-                        line = expression.sub('<a href="/docs/\g<link>">\g<link></a>', line)
+                        line = expression.sub('<a href="/doc/\g<link>">\g<link></a>', line)
             new_parted_text.append(line)
 
         self.parted_text = new_parted_text

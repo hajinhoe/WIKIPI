@@ -106,10 +106,15 @@ table, th, td {
     min-width: 20px;
 }
 
-#blog_body footer {
+#footer {
     margin-top: 10px;
-    padding: 10px 0 0 20px;
-    border-top: 1px solid lightgray;
+    padding: 10px;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+#footer p {
+    display: inline;
 }
 
 .navbar .hidden{

@@ -1,6 +1,7 @@
 #document {
     font-size: 16px;
-    min-height: 200px;
+    min-height: 250px;
+    margin-bottom: 20px;
 }
 
 #document h1{
