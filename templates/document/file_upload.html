@@ -5,12 +5,22 @@
 {%  block javascript %}
 {%  endblock %}
 {%  block title %}
-    <title>{{ subject }}에 파일 올리기 - {{ setting['name'] }}</title>
+    <title>{{ subject }} 파일 관리 - {{ setting['name'] }}</title>
 {%  endblock %}
 {% block navbar_brand %}
     {{ subject }}
 {% endblock %}
 {% block section %}
+    <a href="{{ url_for('doc_write', doc_name=subject) }}">편집기로 가기</a>
+    {% if file_list %}
+    <ul>
+        {% for file in file_list %}
+        <li><a href="/file/{{ subject }}/{{ file }}">[파일:{{ subject }}/{{ file }}]</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>올려진 파일이 없습니다.</p>
+    {% endif %}
     <form action="{{ url_for('upload') }}" method=post enctype=multipart/form-data>
         <input type=file name=file>
         <input type=submit value=Upload>

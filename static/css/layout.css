@@ -22,6 +22,7 @@ body{
     max-width: 250px;
 }
 
+
 .sidebar {
     width: 300px;
     text-align: center;
@@ -121,6 +122,22 @@ table, th, td {
     display: none;
 }
 
+.view-mobile {
+    display: none;
+}
+.view-pc {
+    display: inherit;
+}
+
+.subnavbar:link, .subnavbar:visited, .subnavbar:hover, .subnavbar:active{
+    color: black;
+}
+
+.subnavbar {
+    padding: 10px 0 0 20px;
+    font-size: 42px;
+}
+
 @media only screen and (max-width: 990px) {
     .navbar .hidden{
         display: inline;
@@ -128,7 +145,19 @@ table, th, td {
 }
 
 @media only screen and (max-width: 800px) {
+    .view-pc {
+        display: none;
+    }
     .sidebar {
         display: none;
+    }
+    .view-mobile {
+        display: inherit;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    #navbar_search input{
+        max-width: 200px;
     }
 }

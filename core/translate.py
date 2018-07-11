@@ -352,6 +352,7 @@ class Translator:
         self.make_single_line('em', '//', '//')
         self.make_single_line('sub', ',,', ',,')
         self.make_single_line('sup', '\^\^', '\^\^')
+        self.make_single_line('u', '__', '__')
 
         self.make_inline_element()
 

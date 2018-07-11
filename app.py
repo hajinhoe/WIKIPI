@@ -5,7 +5,7 @@ from base64 import b64encode
 
 from flask import Flask, render_template, request,\
     jsonify, redirect, session, url_for, flash,\
-    send_from_directory, send_file
+    send_from_directory, send_file, abort
 from werkzeug.utils import secure_filename
 from core import *
 import database
@@ -342,13 +342,19 @@ def create_app(test_config=None):
         if 'id' not in session:
             return error_page('not_login')
 
-        sidebar_list = get_current_list()
-        return render_template('document/file_upload.html', setting=get_setting('wiki'), subject=doc_name, sidebar_list=sidebar_list, nav={'document': False})
+        file_path = 'uploads/' + doc_name
+        if os.path.exists(file_path):
+            files = os.listdir(file_path)
+        else:
+            files = None
+        return render_template('document/file_upload.html', file_list=files, setting=get_setting('wiki'),
+                               subject=doc_name, sidebar_list=get_current_list(), nav={'document': False})
 
     @app.route('/upload', methods=['post'])
     def upload():
         if not is_doc(request.form['doc_name']):
             return error_page('not_such_doc')
+
         if 'id' not in session:
             return error_page('not_login')
 
@@ -361,18 +367,13 @@ def create_app(test_config=None):
         # 허용되는 확장자인지 검사함
         if 'file' not in request.files:
             flash('No file part')
-            return 'errr'
+            return error_page('file_extension')
         file = request.files['file']
 
         # 파일을 선택했는지 검사함
         if file.filename == '':
             flash('No selected file')
-            return 'errrrr'
-
-        # 해당 문서가 있는지 검사함
-        db = database.get_db()
-        if not db.execute('SELECT * FROM doc_list WHERE name=?', (request.form['doc_name'],)):
-            return 'errr'
+            return error_page('no_file')
 
         if file and '.' in file.filename:
             file_ext = file.filename.rsplit('.', 1)[1].lower()
@@ -387,22 +388,12 @@ def create_app(test_config=None):
 
                 file.save(os.path.join(upload_folder, filename))
 
-        return redirect(url_for('file_list', doc_name=request.form['doc_name']), code=302)
-
-    @app.route('/files/<path:doc_name>')
-    def file_list(doc_name):
-        file_path = 'uploads/' + doc_name
-        if os.path.exists(file_path):
-            files = os.listdir(file_path)
-        else:
-            return 'No file'
-
-        sidebar_list = get_current_list()
-        return render_template('document/file_list.html', setting=get_setting('wiki'), subject=doc_name,
-                               sidebar_list=sidebar_list, file_list=files, nav={'document': False})
+        return redirect(url_for('file_upload', doc_name=request.form['doc_name']), code=302)
 
     @app.route('/file/<path:file_name>')
     def show_file(file_name):
+        if not os.path.exists('uploads/' + file_name):
+            abort(404)
         return send_file('uploads/' + file_name)
 
     # 설정 관련 페이지

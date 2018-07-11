@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
 {%  endblock %}
 {%  block javascript %}
+    <script src="{{ url_for('static', filename='js/view.js') }}"></script>
 {%  endblock %}
 {%  block title %}
     <title>{{ subject }} - {{ setting['name'] }}</title>
@@ -19,18 +20,17 @@
     <div id="disqus_thread"></div>
     <script>
     var disqus_config = function () {
-        //개발중이라 url 불가능하므로 주석 풀지 말 것
-    //this.page.url = '{{ request.path }}';  // Replace PAGE_URL with your page's canonical URL variable
-    this.page.identifier = '{{ subject }}'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = '{{ setting['wiki_url'] + request.path }}';
+        this.page.identifier = '{{ subject }}';
     };
 
-    (function() { // DON'T EDIT BELOW THIS LINE
-    var d = document, s = d.createElement('script');
-    s.src = '{{ setting['disqus_url'] }}';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
+    (function() {
+        var d = document, s = d.createElement('script');
+        s.src = '{{ setting['disqus_url'] }}';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
     })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <noscript>댓글 기능을 위해서는 자바스크립트를 켜시기 바랍니다. Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     {% endif %}
 {% endblock %}
