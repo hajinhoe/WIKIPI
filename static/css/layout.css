@@ -154,10 +154,27 @@ table, th, td {
     .view-mobile {
         display: inherit;
     }
+    #navbar_search input{
+        width: 80%;
+    }
+    #navbar_search button{
+        width: 20%;
+        max-width: 56px;
+    }
+    .navbar-brand {
+        padding: 10px 0 10px 0;
+        font-size: 32px;
+        width: 70%;
+        overflow: hidden;
+    }
+    .navbar-toggler {
+        width: 75%;
+        max-width: 56px;
+    }
+
 }
 
 @media only screen and (max-width: 400px) {
-    #navbar_search input{
-        max-width: 200px;
-    }
+
+
 }

@@ -23,7 +23,7 @@
                 <li><a href="{{ url_for('doc_request', doc_name=subject) }}">{{ subject }}</a></li>
             </ul>
         {% else %}
-        <p>{{ subject }} 문서가 없습니다. <a href="{{ url_for('doc_write', doc_name=subject) }}">문서를 만들까요?</a></p>
+        <p>"{{ subject }}" 문서가 없습니다. <a href="{{ url_for('doc_write', doc_name=subject) }}">문서를 만들까요?</a></p>
         {% endif %}
         <h2>제목에 포함됨</h2>
         {% if result["included_in_name"] %}

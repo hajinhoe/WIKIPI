@@ -1,7 +1,12 @@
 <!doctype html>
 <html lang="ko">
 <head>
-    {%  block title %}{%  endblock %}
+    {%  block title %}
+    {%  endblock %}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ setting['wiki_url'] + request.path }}" />
+    <meta property="og:image" content="{{ url_for('static', filename='image/' + setting['photo']) }}" />
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- External Module CSS -->
@@ -16,6 +21,7 @@
     <script src="{{ url_for('static', filename='module/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='module/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- required JS for page -->
+    <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
     {%  block javascript %}{%  endblock %}
 </head>
 <body>
@@ -153,29 +159,8 @@
             <footer id="footer">
                 <p>copyleft - 비상업적인 용도라면 자유롭게 글을 이용할 수 있습니다.</p>
             </footer>
-<script>
-    $("#side_search button").on("click", function () {
-        window.location.replace("/search/" + $("#side_search input").val());
-    });
-
-    $("#side_search input").on("keypress", function (e) {
-        if(e.keyCode == 13) {
-            window.location.replace("/search/" + $("#side_search input").val());
-        }
-    });
-
-    $("#navbar_search button").on("click", function () {
-        window.location.replace("/search/" + $("#navbar_search input").val());
-    });
-
-    $("#navbar_search input").on("keypress", function (e) {
-        if(e.keyCode == 13) {
-            window.location.replace("/search/" + $("#navbar_search input").val());
-        }
-    });
-</script>
-</div>
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

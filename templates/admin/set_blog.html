@@ -33,15 +33,16 @@
             <label for="input_main">대문 문서</label>
             <input value="{{ setting['main'] }}" type="text" class="form-control" id="input_main" name="main">
         </div>
-        <p>아래는 댓글 기능을 위한 DISQUS 정보입니다. 자세한 사항은 도움말 문서를 참고하세요.</p>
-        <div class="form-group">
-            <label for="input_disqus_url">DISQUS URL</label>
-            <input value="{{ setting['disqus_url'] }}" type="text" class="form-control" id="input_disqus_url" name="disqus_url">
-        </div>
+        <p>블로그 도메인 주소를 바르게 입력해주세요. og 태그, DISQUS 등에 이용됩니다. 맨 뒤의 "/"는 빼고 입력하세요.</p>
         <div class="form-group">
             <label for="input_wiki_url">블로그 주소</label>
             <input value="{{ setting['wiki_url'] }}" type="text" class="form-control" id="input_wiki_url" aria-describedby="wiki_url_help" name="wiki_url">
             <small id="wiki_url_help" class="form-text text-muted">블로그 도메인 주소를 'https://domain.net'과 같이 입력하십시오.</small>
+        </div>
+        <p>아래는 댓글 기능을 위한 DISQUS 정보입니다. 자세한 사항은 도움말 문서를 참고하세요.</p>
+        <div class="form-group">
+            <label for="input_disqus_url">DISQUS URL</label>
+            <input value="{{ setting['disqus_url'] }}" type="text" class="form-control" id="input_disqus_url" name="disqus_url">
         </div>
         <button type="submit" class="btn btn-primary">저장</button>
     </form>

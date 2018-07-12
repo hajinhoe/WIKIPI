@@ -47,7 +47,7 @@ class Translator:
                 if matched:
                     self.header.append([matched.group('header')])
                     count = [count[0] + 1, 0, 0, 0, 0, 0]
-                    line = h1.sub('<h1><a id="section{0}" href="#index">{0}.<a> \g<header></h1>'.format(count[0]), line)
+                    line = h1.sub('<h1><a id="section{0}" href="#index">{0}.</a> \g<header></h1>'.format(count[0]), line)
                     wanted_header = 2
                     new_parted_text.append(line)
                     continue
