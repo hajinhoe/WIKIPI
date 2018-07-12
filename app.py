@@ -63,7 +63,7 @@ def create_app(test_config=None):
         config = tools.Config('config/' + file).load()
         return config
 
-    def get_wiki_setting():  # 사이드바에 사용될 위키 설정 정보 불러옴
+    def get_sidebar_info():  # 사이드바에 사용될 위키 설정 정보 불러옴
         config = tools.Config('config/wiki').load()
         if config['photo'] is None:
             config['photo'] = "profile.jpg"
@@ -101,11 +101,11 @@ def create_app(test_config=None):
         text = db.execute("SELECT html_data FROM doc join doc_list using (id) WHERE name = ?", (doc_name,)).fetchone()
 
         if text is None:
-            return render_template('document/not_such_doc.html', subject=doc_name, setting=get_wiki_setting(),
+            return render_template('document/not_such_doc.html', subject=doc_name, setting=get_sidebar_info(),
                                    sidebar_list=get_current_list(), nav={'document': False})
         else:
             text = text['html_data']
-            return render_template('document/view.html', subject=doc_name, text=text, setting=get_wiki_setting(),
+            return render_template('document/view.html', subject=doc_name, text=text, setting=get_sidebar_info(),
                                    sidebar_list=get_current_list(), nav={'document': True})
 
     # 문서 리스트 보기
@@ -172,7 +172,7 @@ def create_app(test_config=None):
         if list_data is not None:
             list_data = list_data.fetchall()
 
-        return render_template('document/doc_list.html', setting=get_wiki_setting(), sidebar_list=get_current_list(),
+        return render_template('document/doc_list.html', setting=get_sidebar_info(), sidebar_list=get_current_list(),
                                nav={'document': False}, method=method, method_print=method_display[method],
                                list=list_data, page_numbers=page_numbers, page_number=page_number, last_page=last_page)
 
@@ -212,7 +212,7 @@ def create_app(test_config=None):
                 re_data = re.findall('(.{{0,50}}({0}).{{0,50}})+'.format(search_text), result['markdown_data'])
                 for data in re_data:
                     search_result["included_in_text"][result['name']] += " " + data[0]
-        return render_template('document/doc_search.html', subject=text, setting=get_wiki_setting(),
+        return render_template('document/doc_search.html', subject=text, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False}, result=search_result)
 
     # 문서 부가 기능
@@ -230,7 +230,7 @@ def create_app(test_config=None):
         history = db.execute("SELECT * FROM history where id = ? ORDER BY version DESC",
                              (doc_id,)).fetchall()
 
-        return render_template('document/history.html', subject=doc_name, setting=get_wiki_setting(),
+        return render_template('document/history.html', subject=doc_name, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False}, history=history)
 
     @app.route('/markdown/<path:doc_name>')
@@ -247,7 +247,7 @@ def create_app(test_config=None):
         text = db.execute("SELECT markdown_data FROM history where id = ? ORDER BY version DESC LIMIT 1",
                           (doc_id,)).fetchone()
 
-        return render_template('document/markdown.html', subject=doc_name, setting=get_wiki_setting(),
+        return render_template('document/markdown.html', subject=doc_name, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False}, text=text['markdown_data'])
 
     @app.route('/rlink/<path:doc_name>')
@@ -256,7 +256,7 @@ def create_app(test_config=None):
 
     @app.route('/move/<path:doc_name>')
     def doc_move_page(doc_name):
-        return render_template('document/doc_move.html', subject=doc_name, setting=get_wiki_setting(),
+        return render_template('document/doc_move.html', subject=doc_name, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False})
 
     @app.route('/move', methods=['post', 'get'])
@@ -284,7 +284,7 @@ def create_app(test_config=None):
             return redirect("/doc/{0}".format(doc_name), code=302)
         else:
             sidebar_list = get_current_list()
-            return render_template('error/404.html', setting=get_wiki_setting(), sidebar_list=sidebar_list,
+            return render_template('error/404.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
                                    nav={'document': False})
 
 
@@ -303,11 +303,11 @@ def create_app(test_config=None):
         if doc_id is not None:  # 있는 글을 편집함.
             text = db.execute("SELECT markdown_data FROM history WHERE id = ? order by version DESC LIMIT 1",
                               (doc_id['id'],)).fetchone()
-            return render_template('document/write.html', subject=doc_name, setting=get_wiki_setting(),
+            return render_template('document/write.html', subject=doc_name, setting=get_sidebar_info(),
                                    sidebar_list=sidebar_list, text=text['markdown_data'], nav={'document': False})
         else:
             text = None
-            return render_template('document/write.html', subject=doc_name, setting=get_wiki_setting(),
+            return render_template('document/write.html', subject=doc_name, setting=get_sidebar_info(),
                                    sidebar_list=sidebar_list, nav={'document': False})
 
     @app.route('/preview', methods=['post'])
@@ -387,7 +387,7 @@ def create_app(test_config=None):
             files = os.listdir(file_path)
         else:
             files = None
-        return render_template('document/file_upload.html', file_list=files, setting=get_wiki_setting(),
+        return render_template('document/file_upload.html', file_list=files, setting=get_sidebar_info(),
                                subject=doc_name, sidebar_list=get_current_list(), nav={'document': False})
 
     @app.route('/upload', methods=['post'])
@@ -442,7 +442,7 @@ def create_app(test_config=None):
         if 'id' not in session:
             return error_page('not_login')
         sidebar_list = get_current_list()
-        return render_template('admin/set_blog.html', setting=get_wiki_setting(), sidebar_list=sidebar_list, nav={'document': False})
+        return render_template('admin/set_blog.html', setting=get_sidebar_info(), sidebar_list=sidebar_list, nav={'document': False})
 
     @app.route('/setting/blog/save', methods=['post'])
     def set_blog_save():
@@ -483,7 +483,7 @@ def create_app(test_config=None):
         sidebar_list = get_current_list()
         db = database.get_db()
         user = db.execute("SELECT * FROM user WHERE id=?", (session['id'],)).fetchone()
-        return render_template('admin/set_user.html', setting=get_wiki_setting(), sidebar_list=sidebar_list, user=user, nav={'document': False})
+        return render_template('admin/set_user.html', setting=get_sidebar_info(), sidebar_list=sidebar_list, user=user, nav={'document': False})
 
     @app.route('/setting/user/save', methods=['post'])
     def set_user_save():
@@ -500,10 +500,10 @@ def create_app(test_config=None):
     def login():
         sidebar_list = get_current_list()
         if 'id' in session:
-            return render_template('error/404.html', setting=get_wiki_setting(), sidebar_list=sidebar_list,
+            return render_template('error/404.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
                                    nav={'document': False})
         else:
-            return render_template('admin/login.html', setting=get_wiki_setting(), sidebar_list=sidebar_list,
+            return render_template('admin/login.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
                                    nav={'document': False})
 
     @app.route('/login_session', methods=['post'])
@@ -537,7 +537,7 @@ def create_app(test_config=None):
             return render_template('admin/install.html')
         else:
             sidebar_list = get_current_list()
-            return render_template('error/404.html', setting=get_wiki_setting(), sidebar_list=sidebar_list,
+            return render_template('error/404.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
                                    nav={'document': False})
 
     @app.route('/install', methods=['post'])
@@ -558,20 +558,20 @@ def create_app(test_config=None):
             return redirect('/', code=302)
         else:
             sidebar_list = get_current_list()
-            return render_template('error/404.html', setting=get_wiki_setting(), sidebar_list=sidebar_list,
+            return render_template('error/404.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
                                    nav={'document': False})
 
     # 에러 관련 페이지
     @app.route('/error')
     def error_page(error):
-        return render_template('error/error.html', error=error, setting=get_wiki_setting(),
+        return render_template('error/error.html', error=error, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False})
 
     @app.errorhandler(500)
     @app.errorhandler(404)
     def page_not_found(e):
         sidebar_list = get_current_list()
-        return render_template('error/404.html', setting=get_wiki_setting(),
+        return render_template('error/404.html', setting=get_sidebar_info(),
                                sidebar_list=sidebar_list, nav={'document': False})
 
     return app
