@@ -6,6 +6,7 @@ class Translator:
         self.text = text
         self.parted_text = self.text.split('\r\n')
         self.header = []
+        self.reverse_link = []
 
     # 줄 별로 처리해야 하는 메소드 (먼저 실행)
     def make_multiple_line(self, tag, pattern):
@@ -245,21 +246,28 @@ class Translator:
 
     def make_link(self):  # [[내용]] 꼴을 처리함
         new_parted_text = []
-        expression = re.compile('\[\[((?P<title>.+?)\|)?(?P<link>.+?)\]\]')
-        http_pattern = re.compile('^https?://')
+
+        # http 링크 먼저 처리
+        http_only_url = re.compile('\[\[(?P<link>https?://.+?)\]\]')
+        doc_only_name = re.compile('\[\[(?P<link>.+?)\]\]')
+        http_with_title = re.compile('\[\[(?P<title>.+?)\|(?P<link>https?://.+?)\]\]')
+        doc_with_title = re.compile('\[\[(?P<title>.+?)\|(?P<link>.+?)\]\]')
+
         for line in self.parted_text:
-            searched_line = expression.search(line)
-            if searched_line is not None:
-                if http_pattern.search(searched_line.group('link')) is not None: #http 링크임
-                    if searched_line.group('title') is not None:
-                        line = expression.sub('<a href="\g<link>">\g<title></a>', line)
-                    else:
-                        line = expression.sub('<a href="\g<link>">\g<link></a>', line)
+            line = http_only_url.sub('<a href="\g<link>">\g<link></a>', line)
+            element = doc_only_name.search(line)
+
+            while element is not None:
+                if element.group().find('|') != -1:  # title이 있을 경우임.
+                    if http_with_title.search(line):  # http 링크일 경우임
+                        line = http_with_title.sub('<a href="\g<link>">\g<title></a>', line, 1)
+                    else:  # 도큐먼트일 경우임
+                        self.reverse_link.append(element.group('link'))
+                        line = doc_with_title.sub('<a href="/doc/\g<link>">\g<title></a>', line, 1)
                 else:
-                    if searched_line.group('title') is not None:
-                        line = expression.sub('<a href="/doc/\g<link>">\g<title></a>', line)
-                    else:
-                        line = expression.sub('<a href="/doc/\g<link>">\g<link></a>', line)
+                    self.reverse_link.append(element.group('link'))
+                    line = doc_only_name.sub('<a href="/doc/\g<link>">\g<link></a>', line, 1)
+                element = doc_only_name.search(line)
             new_parted_text.append(line)
 
         self.parted_text = new_parted_text
@@ -360,5 +368,5 @@ class Translator:
         self.text = re.sub('(?P<no_br></?h.>|</li>|</code>|</blockquote>)<br>', '\g<no_br>', self.text)
         self.text = re.sub('<br>(?P<no_br></?h.>)', '\g<no_br>', self.text)
 
-        return self.text
+        return {'html_text': self.text, 'reverse_link': self.reverse_link}
 

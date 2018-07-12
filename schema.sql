@@ -37,9 +37,7 @@ CREATE TABLE history(
 );
 
 CREATE TABLE reverse_link(
-  id integer,
-  referencing integer,
-  PRIMARY KEY (id, referencing),
-  FOREIGN KEY (id) REFERENCES docs_list (id),
-  FOREIGN KEY (referencing) REFERENCES docs_list (id)
-)
+  referenced text,
+  referencing text,
+  PRIMARY KEY (referenced, referencing)
+);

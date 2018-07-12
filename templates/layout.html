@@ -95,7 +95,7 @@
                                     {% endif %}
                                     <a class="dropdown-item" href="{{ url_for('doc_history', doc_name=subject) }}">히스토리</a>
                                     <a class="dropdown-item" href="{{ url_for('doc_markdown', doc_name=subject) }}">마크다운</a>
-                                    <a class="dropdown-item" href="#">역링크</a>
+                                    <a class="dropdown-item" href="{{ url_for('doc_reverse_link', doc_name=subject) }}">역참조</a>
                                 </div>
                             </li>
                             {% endif %}

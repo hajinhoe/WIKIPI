@@ -71,14 +71,14 @@ def create_app(test_config=None):
         config['admin_name'] = db.execute("SELECT name FROM user WHERE grade = 0").fetchone()['name']
         return config
 
-    def is_doc_name(name): # 문서의 이름이 올바른지 검사함
+    def is_doc_name(name):  # 문서의 이름이 올바른지 검사함
         if re.search('[/ ]{2,}', name):
             return False
         if re.search('^(?! ).+(?<!/| )$', name):
             return True
         return False
 
-    def is_doc(name): # 문서가 존재하는지 검사함
+    def is_doc(name):  # 문서가 존재하는지 검사함
         db = database.get_db()
         if db.execute('SELECT * FROM doc_list WHERE name=?', (name,)) is not None:
             return True
@@ -252,7 +252,11 @@ def create_app(test_config=None):
 
     @app.route('/rlink/<path:doc_name>')
     def doc_reverse_link(doc_name):
-        return 'a'
+        db = database.get_db()
+        reverse_link =\
+            db.execute("SELECT referencing FROM reverse_link WHERE referenced = ?", (doc_name,)).fetchall()
+        return render_template('document/doc_reverse_link.html', subject=doc_name, setting=get_sidebar_info(),
+                               sidebar_list=get_current_list(), nav={'document': False}, reverse_link=reverse_link)
 
     @app.route('/move/<path:doc_name>')
     def doc_move_page(doc_name):
@@ -314,8 +318,8 @@ def create_app(test_config=None):
     def preview():
         text = request.form['text']
         translator = translate.Translator(text.replace("\n", "\r\n"))
-        text = translator.compile()
-        return jsonify(text)
+        data = translator.compile()
+        return jsonify(data['html_text'])
 
     @app.route('/save/<path:doc_name>', methods=['post'])
     def doc_save(doc_name):
@@ -334,7 +338,7 @@ def create_app(test_config=None):
 
         markdown_text = request.form['mytext']
         translator = translate.Translator(markdown_text)
-        html_text = translator.compile()
+        data = translator.compile()
 
         if not is_edit:
             id = db.execute("SELECT max(id) FROM doc_list").fetchone()['max(id)']
@@ -342,10 +346,12 @@ def create_app(test_config=None):
                 id = 0
             id += 1
             doc_list_list = (id, doc_name)
-            doc_list = (id, html_text, markdown_text)
+            doc_list = (id, data['html_text'], markdown_text)
             history_list = (id, 1, markdown_text)
             db.execute("INSERT into doc_list VALUES(?, ?, datetime('now', 'localtime'))", doc_list_list)
             db.execute("INSERT into doc VALUES(?, ?, ?)", doc_list)
+            for subject in data['reverse_link']:
+                db.execute("INSERT into reverse_link VALUES(?, ?)", (subject, doc_name))
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
             db.commit()
             return redirect("/doc/{0}".format(doc_name), code=302)
@@ -354,7 +360,10 @@ def create_app(test_config=None):
                                          (doc_id,)).fetchone()['max(version)'] + 1
             history_list = (doc_id, history_version, markdown_text)
             db.execute("INSERT into history VALUES(?, ?, ?, datetime('now', 'localtime'))", history_list)
-            db.execute("UPDATE doc SET html_data = ?, markdown_data = ? WHERE id = ?", (html_text, markdown_text, doc_id))
+            db.execute("DELETE FROM reverse_link WHERE referencing = ?", (doc_name,))
+            for subject in data['reverse_link']:
+                db.execute("INSERT into reverse_link VALUES(?, ?)", (subject, doc_name))
+            db.execute("UPDATE doc SET html_data = ?, markdown_data = ? WHERE id = ?", (data['html_text'], markdown_text, doc_id))
             db.commit()
             return redirect("/doc/{0}".format(doc_name), code=302)
 
@@ -368,6 +377,7 @@ def create_app(test_config=None):
             doc_id = db.execute("SELECT id FROM doc_list WHERE name=?", (doc_name,)).fetchone()['id']
             db.execute("DELETE FROM doc_list WHERE id=?", (doc_id,))
             db.execute("DELETE FROM doc WHERE id=?", (doc_id,))
+            db.execute("DELETE FROM reverse_link WHERE referencing = ?", (doc_name,))
             db.execute("DELETE FROM history WHERE id=?", (doc_id,))
             db.commit()
             return redirect('/', code=302)
