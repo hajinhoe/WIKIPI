@@ -191,8 +191,8 @@ def create_app(test_config=None):
         text_query = "SELECT name, markdown_data FROM doc_list join doc using (id) WHERE markdown_data like ?"
 
         for num in range(len(query_items) - 1):
-            subject_query += " or ?"
-            text_query += "or ?"
+            subject_query += " and name like ?"
+            text_query += " and markdown_data like ?"
         for num in range(len(query_items)):
             query_items[num] = "%" + query_items[num] + "%"
 
