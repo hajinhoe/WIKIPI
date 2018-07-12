@@ -1,0 +1,19 @@
+{%  extends 'layout.html' %}
+
+{%  block css %}
+{%  endblock %}
+{%  block javascript %}
+{%  endblock %}
+{%  block title %}
+    <title>{{ subject }} 옮기기 - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block navbar_brand %}
+    {{ subject }}
+{% endblock %}
+{% block section %}
+    <form action="{{ url_for('doc_move') }}" method=post enctype=multipart/form-data>
+        <input type="text" name=new_doc_name>
+        <input type="hidden" name="doc_name" value="{{ subject }}">
+        <input type=submit value=옮기기>
+    </form>
+{% endblock %}

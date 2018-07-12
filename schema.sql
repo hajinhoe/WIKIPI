@@ -35,3 +35,11 @@ CREATE TABLE history(
   PRIMARY KEY (id, version),
   FOREIGN KEY (id) REFERENCES docs_list (id)
 );
+
+CREATE TABLE reverse_link(
+  id integer,
+  referencing integer,
+  PRIMARY KEY (id, referencing),
+  FOREIGN KEY (id) REFERENCES docs_list (id),
+  FOREIGN KEY (referencing) REFERENCES docs_list (id)
+)

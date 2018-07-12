@@ -29,10 +29,10 @@
                 </header>
                 <aside>
                     <div id ="information" class="card">
-                        <img class="card-img-top" src="{{ url_for('static', filename='image/profile.jpg') }}" alt="블로그 주인의 사진">
+                        <img class="card-img-top" src="{{ url_for('static', filename='image/' + setting['photo']) }}" alt="블로그 주인의 사진">
                         <div class="card-body">
-                            <h5 class="card-title">개발자</h5>
-                            <p class="card-text">위키파이를 개발하고 있습니다.</p>
+                            <h5 class="card-title">{{ setting['admin_name'] }}</h5>
+                            <p class="card-text">{{ setting['word'] }}</p>
                             <a href="{{ url_for('doc_request', doc_name=setting['information']) }}" class="btn btn-primary">정보를 더 보기</a>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                                     {% if 'id' in session %}
                                     <a class="dropdown-item" href="{{ url_for('doc_write', doc_name=subject) }}">편집하기</a>
                                     <a class="dropdown-item" href="{{ url_for('doc_remove', doc_name=subject) }}">지우기</a>
-                                    <a class="dropdown-item" href="#">이동하기</a>
+                                    <a class="dropdown-item" href="{{ url_for('doc_move_page', doc_name=subject) }}">옮기기</a>
                                     <div class="dropdown-divider"></div>
                                     {% endif %}
                                     <a class="dropdown-item" href="{{ url_for('doc_history', doc_name=subject) }}">히스토리</a>
