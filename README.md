@@ -4,4 +4,5 @@
 요구 사항 : 파이썬 3.5 이상
 requirement.txt를 설치할 것
 
-데모 및 설명 : https://docs.enyou.kr/doc/위키파이
+데모 및 설명 :
+https://docs.enyou.kr/doc/위키파이
