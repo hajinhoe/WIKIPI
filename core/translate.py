@@ -272,6 +272,26 @@ class Translator:
 
         self.parted_text = new_parted_text
 
+    def make_font_style(self): # 글자 세부 옵션 처리
+        new_parted_text = []
+
+        expression = re.compile('\[((?P<size>\d+px)|(?P<color>#[A-Z0-9]{6})|[, ]*?)+?:(?P<text>.+?)\]')
+
+        for line in self.parted_text:
+            element = expression.search(line)
+
+            if element:
+                if element.group('size') and element.group('color'):
+                    line = expression.sub('<span style="font-size: \g<size>; color: \g<color>;">\g<text></span>', line)
+                else:
+                    if element.group('size'):
+                        line = expression.sub('<span style="font-size: \g<size>;">\g<text></span>', line)
+                    if element.group('color'):
+                        line = expression.sub('<span style="color: \g<color>;">\g<text></span>', line)
+            new_parted_text.append(line)
+
+        self.parted_text = new_parted_text
+
     # 한 번에 처리하는 메소드 (나중에 실행)
     def make_single_line(self, tag, pattern1, pattern2):
         if pattern1 == '//': # 여러 프로토콜 형식이 ://와 같은 형식을 사용해서 에러를 방지합니다.
@@ -283,10 +303,16 @@ class Translator:
 
     def make_inline_element(self):
         # 사이트 내부 파일 처리
-        self.text = re.sub('\[파일:(?P<file_name>.+?)(?<!mp3|txt|pdf)\]', '<img src="/file/\g<file_name>">', self.text)
-        self.text = re.sub('\[파일:(?P<doc_name>.+)/(?P<file_name>.+?)\]', '<a href="/file/\g<doc_name>/\g<file_name>">\g<file_name></a>', self.text)
+        self.text = re.sub('\[파일:(?P<file_name>.+?)(?<=jpg|gif|png)\]', '<img src="/file/\g<file_name>">', self.text)
+        self.text = re.sub('\[파일:(?P<doc_name>.+)/(?P<file_name>.+?)\]',
+                           '<a href="/file/\g<doc_name>/\g<file_name>">\g<file_name></a>', self.text)
+        # 유튜브 처리
+        self.text = re.sub('\[외부:https://youtu.be/(?P<video>.+?)\]',
+                           '<iframe width="560" height="315" src="https://www.youtube.com/embed/\g<video>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', self.text)
         # 사이트 외부 파일 처리
-        # 글자 세부 옵션 처리
+        self.text = re.sub('\[외부:(?P<link>.+?)(?<=jpg|gif|png)\]', '<img src="\g<link>">', self.text)
+        self.text = re.sub('\[외부:(?P<link_head>.+)/(?P<link_tail>.+?)\]',
+                           '<a href="\g<link_head>/\g<link_tail>">\g<link_tail></a>', self.text)
 
     # 관계가 없는 경우
     def make_index(self):
@@ -350,6 +376,7 @@ class Translator:
         self.make_list()
         self.make_table()
         self.make_link()
+        self.make_font_style()
 
         # 처리된 줄들을 병합한 후, 한 번에 처리하는 메소드를 실행합니다.
         self.text = '<br>'.join(self.parted_text)
