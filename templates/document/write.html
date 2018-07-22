@@ -25,8 +25,7 @@
   <div class="tab-pane fade show active" id="editor" role="tabpanel" aria-labelledby="home-tab">
       <div class="btn-group" role="group" aria-label="Basic example">
           <button type="button" id="input_tab" class="btn btn-secondary">탭 입력</button>
-          <a href="/upload/{{ subject }}"><button type="button" class="btn btn-secondary">파일 업로드</button></a>
-          <a href="/files/{{ subject }}"><button type="button" class="btn btn-secondary">파일 목록</button></a>
+          <a href="/upload/{{ subject }}"><button type="button" class="btn btn-secondary">파일 관리</button></a>
       </div>
       <form name = "text" action="/save/{{ subject }}" method="post">
         <div class="form-group">

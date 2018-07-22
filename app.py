@@ -506,17 +506,15 @@ def create_app(test_config=None):
         db.commit()
         return redirect(url_for('set_user'), code=302)
 
-    @app.route('/login')
+    @app.route('/login', methods=['get'])
     def login():
-        sidebar_list = get_current_list()
         if 'id' in session:
-            return render_template('error/404.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
-                                   nav={'document': False})
+            return error_page(error='already_login')
         else:
-            return render_template('admin/login.html', setting=get_sidebar_info(), sidebar_list=sidebar_list,
-                                   nav={'document': False})
+            return render_template('admin/login.html', setting=get_sidebar_info(), sidebar_list=get_current_list(),
+                                   request_page=request.args['request_page'], nav={'document': False})
 
-    @app.route('/login_session', methods=['post'])
+    @app.route('/login_session', methods=['post', 'get'])
     def login_session():
         db = database.get_db()
         password = request.form['pw'].encode('utf8')
@@ -530,7 +528,7 @@ def create_app(test_config=None):
         if bcrypt.checkpw(password, hashed_password):
             session.permanent = False
             session["id"] = request.form['id']
-            return redirect('/', code=302)
+            return redirect(request.form['request_page'], code=302)
         else:
             return error_page('login')
 

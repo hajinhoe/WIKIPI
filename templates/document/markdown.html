@@ -1,12 +1,16 @@
 {%  extends 'layout.html' %}
 
+{%  block title %}
+    <title>{{ subject }} (마크다운) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ subject }} (마크다운) - {{ setting['name'] }}">
+    <meta property="og:description" content="{{ subject }} (마크다운)">
+{% endblock %}
 {%  block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/write.css') }}">
 {%  endblock %}
 {%  block javascript %}
-{%  endblock %}
-{%  block title %}
-    <title>{{ subject }} (마크다운) - {{ setting['name'] }}</title>
 {%  endblock %}
 {% block navbar_brand %}
     {{ subject }}

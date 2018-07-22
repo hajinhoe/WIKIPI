@@ -1,26 +1,33 @@
 {%  extends 'layout.html' %}
 
+{%  block title %}
+    <title>{{ subject }} (히스토리) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ subject }} (히스토리) - {{ setting['name'] }}">
+    <meta property="og:description" content="{{ subject }} (히스토리)">
+{% endblock %}
 {%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
 {%  endblock %}
 {%  block javascript %}
 {%  endblock %}
 {% block navbar_brand %}
     {{ subject }}
 {% endblock %}
-{%  block title %}
-    <title>{{ subject }} (히스토리) - {{ setting['name'] }}</title>
-{%  endblock %}
 {% block section %}
-    <table>
-        <tr>
-            <th>번호</th>
-            <th>수정한 날짜</th>
-        </tr>
-        {% for element in history %}
-        <tr>
-            <td>{{ element['version'] }}</td>
-            <td>{{ element['date'] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div id="document">
+        <table>
+            <tr>
+                <th>번호</th>
+                <th>수정한 날짜</th>
+            </tr>
+            {% for element in history %}
+            <tr>
+                <td>{{ element['version'] }}</td>
+                <td>{{ element['date'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

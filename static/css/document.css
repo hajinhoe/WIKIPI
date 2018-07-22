@@ -78,3 +78,16 @@
 #document img {
     max-width: 100%;
 }
+
+#document .youtube_video{
+    max-width: 100%;
+    max-height: 30%;
+    width: 600px;
+    height: 400px;
+}
+
+@media only screen and (max-width: 600px) {
+    #document .youtube_video{
+        height: 200px;
+    }
+}

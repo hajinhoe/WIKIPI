@@ -155,11 +155,8 @@ table, th, td {
         display: inherit;
     }
     #navbar_search input{
-        width: 80%;
-    }
-    #navbar_search button{
-        width: 20%;
-        max-width: 56px;
+        width: 100%;
+        max-width: none;
     }
     .navbar-brand {
         padding: 10px 0 10px 0;
@@ -171,7 +168,6 @@ table, th, td {
         width: 75%;
         max-width: 56px;
     }
-
 }
 
 @media only screen and (max-width: 400px) {

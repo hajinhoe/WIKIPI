@@ -1,29 +1,40 @@
 {%  extends 'layout.html' %}
 
+{%  block title %}
+    <title>{{ subject }} (파일 관리) - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ subject }} (파일 관리) - {{ setting['name'] }}">
+    <meta property="og:description" content="{{ subject }} (파일 관리)">
+{% endblock %}
 {%  block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
 {%  endblock %}
 {%  block javascript %}
-{%  endblock %}
-{%  block title %}
-    <title>{{ subject }} 파일 관리 - {{ setting['name'] }}</title>
 {%  endblock %}
 {% block navbar_brand %}
     {{ subject }}
 {% endblock %}
 {% block section %}
-    <a href="{{ url_for('doc_write', doc_name=subject) }}">편집기로 가기</a>
-    {% if file_list %}
-    <ul>
-        {% for file in file_list %}
-        <li><a href="/file/{{ subject }}/{{ file }}">[파일:{{ subject }}/{{ file }}]</a></li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>올려진 파일이 없습니다.</p>
-    {% endif %}
-    <form action="{{ url_for('upload') }}" method=post enctype=multipart/form-data>
-        <input type=file name=file>
-        <input type=submit value=Upload>
-        <input type="hidden" name="doc_name" value="{{ subject }}">
-    </form>
+    <a id="back_button" class="btn btn-primary btn-lg" href="{{ url_for('doc_write', doc_name=subject) }}"><i class="fas fa-arrow-left"></i></a>
+    <div id="form_body">
+        {% if file_list %}
+        <ul>
+            {% for file in file_list %}
+            <li><a href="/file/{{ subject }}/{{ file }}">[파일:{{ subject }}/{{ file }}]</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>올려진 파일이 없습니다.</p>
+        {% endif %}
+        <form action="{{ url_for('upload') }}" method=post enctype=multipart/form-data>
+            <div class="form-group">
+                <input type=file class="form-control" name=file>
+                <div id="upload_button">
+                    <input type=submit class="form-control" value=올리기 >
+                </div>
+                <input type="hidden" name="doc_name" value="{{ subject }}">
+            </div>
+        </form>
+    </div>
 {% endblock %}

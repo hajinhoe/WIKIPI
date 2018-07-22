@@ -1,5 +1,12 @@
 {%  extends 'layout.html' %}
 
+{%  block title %}
+    <title>{{ subject }} - {{ setting['name'] }}</title>
+{%  endblock %}
+{% block meta %}
+    <meta property="og:title" content="{{ subject }} - {{ setting['name'] }}">
+    <meta property="og:description" content="{{ subject }}">
+{% endblock %}
 {% block navbar_brand %}
     {{ subject }}
 {% endblock %}
@@ -8,10 +15,6 @@
 {%  endblock %}
 {%  block javascript %}
     <script src="{{ url_for('static', filename='js/view.js') }}"></script>
-{%  endblock %}
-{%  block title %}
-    <title>{{ subject }} - {{ setting['name'] }}</title>
-    <meta property="og:title" content="{{ subject }}" />
 {%  endblock %}
 {% block section %}
     <div id="document">

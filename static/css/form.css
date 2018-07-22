@@ -1,6 +1,30 @@
+#form_body{
+    max-width: 400px;
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
 section form{
     max-width: 400px;
     margin: auto;
     margin-top: 30px;
     margin-bottom: 30px;
+}
+
+.form-control {
+    display: inline;
+}
+
+#upload_button{
+    text-align: right;
+}
+
+#upload_button input{
+    margin-top: 10px;
+    width: 80px;
+}
+
+#back_button{
+    float: right;
 }

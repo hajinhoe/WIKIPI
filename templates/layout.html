@@ -1,12 +1,11 @@
 <!doctype html>
 <html lang="ko">
 <head>
-    {%  block title %}
-    {%  endblock %}
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ setting['wiki_url'] + request.path }}" />
-    <meta property="og:image" content="{{ url_for('static', filename='image/' + setting['photo']) }}" />
-
+    {% block title %}{% endblock %}
+    {% block meta %}{% endblock %}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ setting['wiki_url'] + request.path }}">
+    <meta property="og:image" content="{{ setting['wiki_url'] + url_for('static', filename='image/' + setting['photo']) }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- External Module CSS -->
@@ -22,7 +21,8 @@
     <script src="{{ url_for('static', filename='module/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- required JS for page -->
     <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
-    {%  block javascript %}{%  endblock %}
+    {% block javascript %}
+    {% endblock %}
 </head>
 <body>
     <div class="container-fluid">
@@ -124,14 +124,14 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{{ url_for('set_blog') }}">관리</a>
                                     {% else %}
-                                    <a class="dropdown-item" href="{{ url_for('login') }}">로그인</a>
+                                    <a class="dropdown-item" href="{{ url_for('login', request_page=request.path) }}">로그인</a>
                                     {% endif %}
                                 </div>
                             </li>
                         </ul>
                         <div id = "navbar_search" class="form-inline my-2 my-lg-0">
                             <input class="form-control mr-sm-2" type="search" placeholder="문서 이름을 입력하세요." aria-label="Search">
-                            <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">검색</button>
+                            <button class="view-pc btn btn-outline-dark my-2 my-sm-0" type="submit">검색</button>
                         </div>
                     </div>
                 </nav>

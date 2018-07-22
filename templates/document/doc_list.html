@@ -1,17 +1,21 @@
-{%  extends 'layout.html' %}
+{% extends 'layout.html' %}
 
+{% block title %}
+    <title>문서 일람 - {{ setting['name'] }}</title>
+{% endblock %}
+{% block meta %}
+    <meta property="og:title" content="문서 일람 - {{ setting['name'] }}">
+    <meta property="og:description" content="위키 전체 문서 일람">
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/doc_list.css') }}">
+{% endblock %}
+{% block javascript %}
+{% endblock %}
 {% block navbar_brand %}
     문서 일람
 {% endblock %}
-{%  block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/doc_list.css') }}">
-{%  endblock %}
-{%  block javascript %}
-{%  endblock %}
-{%  block title %}
-    <title>문서 일람 - {{ setting['name'] }}</title>
-{%  endblock %}
 {% block section %}
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">

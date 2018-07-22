@@ -45,43 +45,53 @@ class Translator:
             if wanted_header >= 1:
                 matched = h1.search(line)
                 if matched:
+                    if count[0] != 0:
+                        new_parted_text.append('</div>')
                     self.header.append([matched.group('header')])
                     count = [count[0] + 1, 0, 0, 0, 0, 0]
                     line = h1.sub('<h1><a id="section{0}" href="#index">{0}.</a> \g<header></h1>'.format(count[0]), line)
                     wanted_header = 2
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             if wanted_header >= 2:
                 matched = h2.search(line)
                 if matched:
+                    new_parted_text.append('</div>')
                     self.header[count[0] - 1].append([matched.group('header')])
                     count = [count[0], count[1] + 1, 0, 0, 0, 0]
                     line = h2.sub('<h2><a id="section{0}.{1}" href="#index">{0}.{1}.</a> \g<header></h2>'.format(count[0], count[1]), line)
                     wanted_header = 3
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             if wanted_header >= 3:
                 matched = h3.search(line)
                 if matched:
+                    new_parted_text.append('</div>')
                     self.header[count[0] - 1][count[1]].append([matched.group('header')])
                     count = [count[0], count[1], count[2] + 1, 0, 0, 0]
                     line = h3.sub('<h3><a id="section{0}.{1}.{2}" href="#index">{0}.{1}.{2}.</a> \g<header></h3>'.format(count[0], count[1], count[2]), line)
                     wanted_header = 4
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             if wanted_header >= 4:
                 matched = h4.search(line)
                 if matched:
+                    new_parted_text.append('</div>')
                     self.header[count[0] - 1][count[1]][count[2]].append([matched.group('header')])
                     count = [count[0], count[1], count[2], count[3] + 1, 0, 0]
                     line = h4.sub('<h4><a id="section{0}.{1}.{2}.{3}" href="#index">{0}.{1}.{2}.{3}.</a> \g<header></h4>'.format(count[0], count[1], count[2], count[3]),
                                   line)
                     wanted_header = 5
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             if wanted_header >= 5:
                 matched = h5.search(line)
                 if matched:
+                    new_parted_text.append('</div>')
                     self.header[count[0] - 1][count[1]][count[2]][count[3]].append([matched.group('header')])
                     count = [count[0], count[1], count[2], count[3], count[4] + 1, 0]
                     line = h5.sub(
@@ -89,17 +99,21 @@ class Translator:
                                                                          count[4]), line)
                     wanted_header = 6
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             if wanted_header >= 6:
                 matched = h6.search(line)
                 if matched:
+                    new_parted_text.append('</div>')
                     self.header[count[0] - 1][count[1]][count[2]][count[3]][count[4]].append(matched.group('header'))
                     count = [count[0], count[1], count[2], count[3], count[4], count[5] + 1]
                     line = h5.sub('<h6><a id="section{0}.{1}.{2}.{3}.{4}.{5}" href="#index">{0}.{1}.{2}.{3}.{4}.{5}.</a> \g<header></h6>'
                                   .format(count[0], count[1], count[2], count[3], count[4], count[5]), line)
                     new_parted_text.append(line)
+                    new_parted_text.append('<div class="doc_content">')
                     continue
             new_parted_text.append(line)
+        new_parted_text.append('</div>')
         self.parted_text = new_parted_text
 
     def make_block_element(self):
@@ -122,7 +136,7 @@ class Translator:
         # unordered list
         previous = False
         new_parted_text = []
-        rule = re.compile('^\* (?P<string>.*)')
+        rule = re.compile('^ \*(?P<string>.*)')
         rule_of_previous = re.compile('(?P<string>.*)</ul>')
         for line in self.parted_text:
             if rule.search(line) is not None:
@@ -141,7 +155,7 @@ class Translator:
         # ordered list
         previous = 0
         new_parted_text = []
-        rule = re.compile('^(?P<number>[0-9]+)\. (?P<string>.*)')
+        rule = re.compile('^ (?P<number>[0-9]+)\.(?P<string>.*)')
         rule_of_previous = re.compile('(?P<string>.*)</ol>')
         for line in self.parted_text:
             element = rule.search(line)
@@ -279,15 +293,30 @@ class Translator:
 
         for line in self.parted_text:
             element = expression.search(line)
-
-            if element:
+            while element:
                 if element.group('size') and element.group('color'):
-                    line = expression.sub('<span style="font-size: \g<size>; color: \g<color>;">\g<text></span>', line)
+                    line = expression.sub('<span style="font-size: \g<size>; color: \g<color>;">\g<text></span>', line, 1)
                 else:
                     if element.group('size'):
-                        line = expression.sub('<span style="font-size: \g<size>;">\g<text></span>', line)
+                        line = expression.sub('<span style="font-size: \g<size>;">\g<text></span>', line, 1)
                     if element.group('color'):
-                        line = expression.sub('<span style="color: \g<color>;">\g<text></span>', line)
+                        line = expression.sub('<span style="color: \g<color>;">\g<text></span>', line, 1)
+                element = expression.search(line)
+            new_parted_text.append(line)
+
+        self.parted_text = new_parted_text
+
+    def make_paragraph(self): # 별 다른 태그 요소가 없다면 paragraph로 처리합니다.
+        new_parted_text = []
+
+        expression = re.compile('^(?!<.+?>)(?P<text>.*?)(?!</.+?>)$')
+
+        for line in self.parted_text:
+            element = expression.search(line)
+
+            if element:
+                line = expression.sub('<p>\g<text></p>', line)
+
             new_parted_text.append(line)
 
         self.parted_text = new_parted_text
@@ -304,14 +333,14 @@ class Translator:
     def make_inline_element(self):
         # 사이트 내부 파일 처리
         self.text = re.sub('\[파일:(?P<file_name>.+?)(?<=jpg|gif|png)\]', '<img src="/file/\g<file_name>">', self.text)
-        self.text = re.sub('\[파일:(?P<doc_name>.+)/(?P<file_name>.+?)\]',
+        self.text = re.sub('\[파일:(?P<doc_name>.+?)/(?P<file_name>.+?)\]',
                            '<a href="/file/\g<doc_name>/\g<file_name>">\g<file_name></a>', self.text)
         # 유튜브 처리
         self.text = re.sub('\[외부:https://youtu.be/(?P<video>.+?)\]',
-                           '<iframe width="560" height="315" src="https://www.youtube.com/embed/\g<video>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', self.text)
+                           '<iframe class="youtube_video" src="https://www.youtube.com/embed/\g<video>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>', self.text)
         # 사이트 외부 파일 처리
         self.text = re.sub('\[외부:(?P<link>.+?)(?<=jpg|gif|png)\]', '<img src="\g<link>">', self.text)
-        self.text = re.sub('\[외부:(?P<link_head>.+)/(?P<link_tail>.+?)\]',
+        self.text = re.sub('\[외부:(?P<link_head>.+?)/(?P<link_tail>.+?)\]',
                            '<a href="\g<link_head>/\g<link_tail>">\g<link_tail></a>', self.text)
 
     # 관계가 없는 경우
@@ -375,11 +404,14 @@ class Translator:
         self.make_block_element()
         self.make_list()
         self.make_table()
-        self.make_link()
+        self.make_paragraph()
+
+        # 아래 두 가지는 줄 별로 처리하지만, inline이므로, paragraph 다음에 와야 합니다!
         self.make_font_style()
+        self.make_link()
 
         # 처리된 줄들을 병합한 후, 한 번에 처리하는 메소드를 실행합니다.
-        self.text = '<br>'.join(self.parted_text)
+        self.text = ''.join(self.parted_text)
 
         # 한 번에 처리하는 메소도를 실행합니다.
         self.make_single_line('strong', '\*\*', '\*\*')
@@ -392,8 +424,8 @@ class Translator:
         self.make_inline_element()
 
         # 후처리를 합니다.
-        self.text = re.sub('(?P<no_br></?h.>|</li>|</code>|</blockquote>)<br>', '\g<no_br>', self.text)
-        self.text = re.sub('<br>(?P<no_br></?h.>)', '\g<no_br>', self.text)
+        self.text = re.sub('(?P<no_br></?div( class="doc_content")?>|</li>|</code>|</blockquote>)<br>', '\g<no_br>', self.text)
+        self.text = re.sub('<br>(?P<no_br></?div( class="doc_content")?>)', '\g<no_br>', self.text)
 
         return {'html_text': self.text, 'reverse_link': self.reverse_link}
 
