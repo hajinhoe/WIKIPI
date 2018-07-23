@@ -1,21 +1,22 @@
-{%  extends 'layout.html' %}
+{% extends 'layout.html' %}
 
-{%  block title %}
+{% block title %}
     <title>{{ subject }} - {{ setting['name'] }}</title>
-{%  endblock %}
+{% endblock %}
 {% block meta %}
     <meta property="og:title" content="{{ subject }} - {{ setting['name'] }}">
+    <meta name="description" content="{{ subject }}">
     <meta property="og:description" content="{{ subject }}">
 {% endblock %}
 {% block navbar_brand %}
-    {{ subject }}
+    문서 보기
 {% endblock %}
-{%  block css %}
+{% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/document.css') }}">
-{%  endblock %}
-{%  block javascript %}
+{% endblock %}
+{% block javascript %}
     <script src="{{ url_for('static', filename='js/view.js') }}"></script>
-{%  endblock %}
+{% endblock %}
 {% block section %}
     <div id="document">
         {{ text|safe }}
@@ -23,18 +24,18 @@
     {% if setting['disqus_url'] %}
     <div id="disqus_thread"></div>
     <script>
-    var disqus_config = function () {
-        this.page.url = '{{ setting['wiki_url'] + request.path }}';
-        this.page.identifier = '{{ subject }}';
-    };
+        var disqus_config = function () {
+            this.page.url = '{{ setting['wiki_url'] + request.path }}';
+            this.page.identifier = '{{ subject }}';
+        };
 
-    (function() {
-        var d = document, s = d.createElement('script');
-        s.src = '{{ setting['disqus_url'] }}';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-    })();
+        (function() {
+            var d = document, s = d.createElement('script');
+            s.src = '{{ setting['disqus_url'] }}';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
     </script>
-    <noscript>댓글 기능을 위해서는 자바스크립트를 켜시기 바랍니다. Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <noscript>댓글 기능을 위해서는 자바스크립트를 켜시기 바랍니다. Please enable JavaScript.</noscript>
     {% endif %}
 {% endblock %}

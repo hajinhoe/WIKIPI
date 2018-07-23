@@ -129,13 +129,27 @@ table, th, td {
     display: inherit;
 }
 
-.subnavbar:link, .subnavbar:visited, .subnavbar:hover, .subnavbar:active{
+#title_bar a:link, #title_bar a:visited, #title_bar a:hover, #title_bar a:active{
     color: black;
 }
 
-.subnavbar {
-    padding: 10px 0 0 20px;
+#title_bar a{
+    padding: 10px 0 10px 20px;
+    display: block;
+}
+
+#title_bar {
+    padding: 0;
     font-size: 42px;
+    display: block;
+    font-weight: bold;
+    border-left: 5px solid #424242;
+}
+
+#title_bar_bottom{
+    margin: 0;
+    padding: 0;
+    border-bottom: 2px solid #f8f9fa;
 }
 
 @media only screen and (max-width: 990px) {
@@ -161,7 +175,7 @@ table, th, td {
     .navbar-brand {
         padding: 10px 0 10px 0;
         font-size: 32px;
-        width: 70%;
+        max-width: 65%;
         overflow: hidden;
     }
     .navbar-toggler {

@@ -113,7 +113,8 @@ class Translator:
                     new_parted_text.append('<div class="doc_content">')
                     continue
             new_parted_text.append(line)
-        new_parted_text.append('</div>')
+        if count[0] != 0:
+            new_parted_text.append('</div>')
         self.parted_text = new_parted_text
 
     def make_block_element(self):

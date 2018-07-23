@@ -21,8 +21,7 @@
     <script src="{{ url_for('static', filename='module/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- required JS for page -->
     <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
-    {% block javascript %}
-    {% endblock %}
+    {% block javascript %}{% endblock %}
 </head>
 <body>
     <div class="container-fluid">
@@ -72,8 +71,8 @@
                     </div>
                 </aside>
             </div>
-            <div id="nav_bar" class="col">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="col">
+                <nav id="nav_bar" class="navbar navbar-expand-lg navbar-light bg-light">
                     <a class="navbar-brand view-pc" href="{% if subject %}{{ url_for('doc_request', doc_name=subject) }}{% else %}#{% endif %}">{% block navbar_brand %}{% endblock %}</a>
                     <a class="navbar-brand view-mobile" href="{{ url_for('doc_request', doc_name=setting['main']) }}">{{ setting['name'] }}</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,7 +134,7 @@
                         </div>
                     </div>
                 </nav>
-            <div id="option_bar">
+                <div id="option_bar">
                     <ul>
                         <li>
                             <a class="nav-link" href="#nav_bar"><i class="fas fa-arrow-circle-up"></i></a>
@@ -150,15 +149,18 @@
                         {% endif %}
                     </ul>
                 </div>
-                {% if subject %}<a class="subnavbar view-mobile" href="{{ url_for('doc_request', doc_name=subject) }}">{{ subject }}</a>{% endif %}
-            <div id="blog_body">
-                <section>
-                    {%  block section %}{%  endblock %}
-                </section>
-            </div>
-            <footer id="footer">
-                <p>copyleft - 비상업적인 용도라면 자유롭게 글을 이용할 수 있습니다.</p>
-            </footer>
+                {% if subject %}
+                <div id="title_bar">
+                    <a href="{{ url_for('doc_request', doc_name=subject) }}">{{ subject }}</a>
+                    <div id="title_bar_bottom"></div>
+                </div>
+                {% endif %}
+                <div id="blog_body">
+                    {% block section %}{% endblock %}
+                </div>
+                <footer id="footer">
+                    <p>copyleft - 비상업적인 용도라면 자유롭게 글을 이용할 수 있습니다.</p>
+                </footer>
             </div>
         </div>
     </div>
