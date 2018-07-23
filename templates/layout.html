@@ -26,12 +26,47 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <div class="col, sidebar">
-                <header>
-                    <div id="logo">
-                        <a href="/">{{ setting['name'] }}</a>
+            <header>
+                <div id="logo" class="header_item">
+                    <a href="/">{{ setting['name'] }}</a>
+                </div>
+                <div id="header_menu" class="header_item dropdown_box">
+                    <span class="dropdown">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-box"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{{ url_for('doc_list') }}">문서일람</a>
+                        </div>
+                    </span>
+                    <span class="dropdown">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-cog"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            {% if 'id' in session %}
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">로그아웃</a>
+                            <a class="dropdown-item" href="{{ url_for('set_user') }}">유저정보</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('set_blog') }}">관리</a>
+                            {% else %}
+                            <a class="dropdown-item" href="{{ url_for('login', request_page=request.path) }}">로그인</a>
+                            {% endif %}
+                        </div>
+                    </span>
+                </div>
+                <div id="header_search" class="search view-mobile">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="검색" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                        </div>
                     </div>
-                </header>
+                </div>
+            </header>
+        </div>
+        <div class="row">
+            <div class="col, sidebar">
                 <aside>
                     <div id ="information" class="card">
                         <img class="card-img-top" src="{{ url_for('static', filename='image/' + setting['photo']) }}" alt="블로그 주인의 사진">
@@ -41,7 +76,7 @@
                             <a href="{{ url_for('doc_request', doc_name=setting['information']) }}" class="btn btn-primary">정보를 더 보기</a>
                         </div>
                     </div>
-                    <div id="side_search">
+                    <div id="side_search" class="search">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="검색" aria-label="Recipient's username" aria-describedby="basic-addon2">
                             <div class="input-group-append">
@@ -72,68 +107,6 @@
                 </aside>
             </div>
             <div class="col">
-                <nav id="nav_bar" class="navbar navbar-expand-lg navbar-light bg-light">
-                    <a class="navbar-brand view-pc" href="{% if subject %}{{ url_for('doc_request', doc_name=subject) }}{% else %}#{% endif %}">{% block navbar_brand %}{% endblock %}</a>
-                    <a class="navbar-brand view-mobile" href="{{ url_for('doc_request', doc_name=setting['main']) }}">{{ setting['name'] }}</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('random') }}">
-                                    <i class="fas fa-random"></i> <span class="hidden">무작위</span>
-                                </a>
-                            </li>
-                            {% if nav['document'] %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-file-alt"></i> <span class="hidden">문서</span>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    {% if 'id' in session %}
-                                    <a class="dropdown-item" href="{{ url_for('doc_write', doc_name=subject) }}">편집하기</a>
-                                    <a class="dropdown-item" href="{{ url_for('doc_remove', doc_name=subject) }}">지우기</a>
-                                    <a class="dropdown-item" href="{{ url_for('doc_move_page', doc_name=subject) }}">옮기기</a>
-                                    <div class="dropdown-divider"></div>
-                                    {% endif %}
-                                    <a class="dropdown-item" href="{{ url_for('doc_history', doc_name=subject) }}">히스토리</a>
-                                    <a class="dropdown-item" href="{{ url_for('doc_markdown', doc_name=subject) }}">마크다운</a>
-                                    <a class="dropdown-item" href="{{ url_for('doc_reverse_link', doc_name=subject) }}">역참조</a>
-                                </div>
-                            </li>
-                            {% endif %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-box"></i> <span class="hidden">부가기능</span>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ url_for('doc_list') }}">문서일람</a>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-cog"></i> <span class="hidden">설정</span>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    {% if 'id' in session %}
-                                    <a class="dropdown-item" href="{{ url_for('logout') }}">로그아웃</a>
-                                    <a class="dropdown-item" href="{{ url_for('set_user') }}">유저정보</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{ url_for('set_blog') }}">관리</a>
-                                    {% else %}
-                                    <a class="dropdown-item" href="{{ url_for('login', request_page=request.path) }}">로그인</a>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        </ul>
-                        <div id = "navbar_search" class="form-inline my-2 my-lg-0">
-                            <input class="form-control mr-sm-2" type="search" placeholder="문서 이름을 입력하세요." aria-label="Search">
-                            <button class="view-pc btn btn-outline-dark my-2 my-sm-0" type="submit">검색</button>
-                        </div>
-                    </div>
-                </nav>
                 <div id="option_bar">
                     <ul>
                         <li>
@@ -154,6 +127,29 @@
                     <a href="{{ url_for('doc_request', doc_name=subject) }}">{{ subject }}</a>
                     <div id="title_bar_bottom"></div>
                 </div>
+                {% if nav['document'] %}
+                <div class="dropdown_box">
+                    <a href="{{ url_for('random') }}">
+                        <i class="fas fa-random"></i>
+                    </a>
+                    <span class="dropdown">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            {% if 'id' in session %}
+                            <a class="dropdown-item" href="{{ url_for('doc_write', doc_name=subject) }}">편집하기</a>
+                            <a class="dropdown-item" href="{{ url_for('doc_remove', doc_name=subject) }}">지우기</a>
+                            <a class="dropdown-item" href="{{ url_for('doc_move_page', doc_name=subject) }}">옮기기</a>
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
+                            <a class="dropdown-item" href="{{ url_for('doc_history', doc_name=subject) }}">히스토리</a>
+                            <a class="dropdown-item" href="{{ url_for('doc_markdown', doc_name=subject) }}">마크다운</a>
+                            <a class="dropdown-item" href="{{ url_for('doc_reverse_link', doc_name=subject) }}">역참조</a>
+                        </div>
+                    </span>
+                </div>
+                {% endif %}
                 {% endif %}
                 <div id="blog_body">
                     {% block section %}{% endblock %}

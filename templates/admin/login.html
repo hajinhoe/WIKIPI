@@ -8,11 +8,9 @@
 {%  block title %}
     <title>로그인 - {{ setting['name'] }}</title>
 {%  endblock %}
-{% block navbar_brand %}
-    로그인
-{% endblock %}
 {% block section %}
     <form name="login" action="{{ url_for('login_session') }}" method="post">
+        <h1>로그인</h1>
         <div class="form-group">
             <label for="input_id">아이디</label>
             <input type="text" class="form-control" id="input_id" name="id">

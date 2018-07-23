@@ -12,11 +12,9 @@
 {%  endblock %}
 {%  block javascript %}
 {%  endblock %}
-{% block navbar_brand %}
-    {{ subject }}
-{% endblock %}
 {% block section %}
     <form action="{{ url_for('doc_move') }}" method=post enctype=multipart/form-data>
+        <h1>문서 옮기기</h1>
         <div class="row form-group">
             <p>이 문서를 아래에 입력한 문서로 옮깁니다.</p>
             <input class="col-10 form-control" type="text" name=new_doc_name>

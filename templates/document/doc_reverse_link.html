@@ -11,10 +11,8 @@
 {%  endblock %}
 {%  block javascript %}
 {%  endblock %}
-{% block navbar_brand %}
-    {{ subject }}
-{% endblock %}
 {% block section %}
+    <h1>역참조 현황</h1>
     {% if reverse_link %}
     <ul>
         {% for link in reverse_link %}
@@ -22,6 +20,6 @@
         {% endfor %}
     </ul>
     {% else %}
-    <p>역참조된 적이 없습니다.</p>
+    <p>참조된 적이 없습니다.</p>
     {% endif %}
 {% endblock %}

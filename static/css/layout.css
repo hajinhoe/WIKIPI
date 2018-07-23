@@ -8,20 +8,54 @@ body{
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-.navbar-brand{
-    font-size: 42px;
-    margin: 0 8px 0 8px;
-    padding: 0;
+header{
+    background-color: #f8f9fa;
+    width: 100%;
+    min-height: 72px;
+    padding: auto;
 }
 
-.navbar{
-    padding: 0 8px 0 8px;
+#logo {
+    display: inline-block;
+    margin-top: 9px;
+    margin-left: 16px;
+}
+#logo a{
+    font-size: 36px;
+    color: black;
+    text-decoration: none;
 }
 
-#navbar_search input{
-    max-width: 250px;
+#header_menu{
+    display: inline;
+    margin-right: 10px;
+    margin-top: 16px;
+    float: right;
 }
 
+#header_search{
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.dropdown_box{
+    font-size: 24px;
+    display: block;
+    text-align: right;
+}
+
+.dropdown_box a{
+    color: black;
+    margin-left: 5px;
+    margin-right: 5px;
+    text-decoration: none;
+}
+
+.header_item {
+    display: inline;
+}
 
 .sidebar {
     width: 300px;
@@ -29,19 +63,11 @@ body{
     border-right: 1px solid lightgray;
     padding-right: 5px;
     padding-left: 5px;
+    margin-top: 10px;
 }
 
 .col {
     padding: 0;
-}
-
-.sidebar{
-    padding-top: 10px;
-}
-
-.sidebar #logo{
-    height: 55px;
-    margin-bottom: 5px;
 }
 
 .sidebar .card{
@@ -56,19 +82,12 @@ body{
     margin-bottom: 10px;
 }
 
-header a:link, header a:visited, header a:hover, header a:active {
-    color: black;
-    font-size: 32px;
-    text-align: center;
-    margin-top: 16px;
-}
-
-#side_search button {
+.search button {
     background-color: black;
     color: white;
 }
 
-#side_search .mb-3{
+.search .mb-3{
     margin-bottom: 10px !important;
 }
 
@@ -97,6 +116,7 @@ table, th, td {
     background: #f8f9fa;
     padding: 0;
     margin: 10px 0 0 0;
+    z-index: 5;
 }
 
 #option_bar a{
@@ -125,6 +145,7 @@ table, th, td {
 .view-mobile {
     display: none;
 }
+
 .view-pc {
     display: inherit;
 }
@@ -135,6 +156,7 @@ table, th, td {
 
 #title_bar a{
     padding: 10px 0 10px 20px;
+    margin-top: 10px;
     display: block;
 }
 
@@ -152,39 +174,32 @@ table, th, td {
     border-bottom: 2px solid #f8f9fa;
 }
 
-@media only screen and (max-width: 990px) {
-    .navbar .hidden{
-        display: inline;
-    }
-}
-
 @media only screen and (max-width: 800px) {
     .view-pc {
-        display: none;
-    }
-    .sidebar {
         display: none;
     }
     .view-mobile {
         display: inherit;
     }
-    #navbar_search input{
-        width: 100%;
-        max-width: none;
+    .sidebar {
+        display: none;
     }
-    .navbar-brand {
-        padding: 10px 0 10px 0;
-        font-size: 32px;
-        max-width: 65%;
-        overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+    #logo {
+        margin-top: 15px;
     }
-    .navbar-toggler {
-        width: 75%;
-        max-width: 56px;
+    #logo a{
+        font-size: 24px;
     }
 }
 
 @media only screen and (max-width: 400px) {
-
-
+    #logo {
+        margin-top: 19px;
+    }
+    #logo a{
+        font-size: 16px;
+    }
 }

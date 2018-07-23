@@ -212,7 +212,7 @@ def create_app(test_config=None):
                 re_data = re.findall('(.{{0,50}}({0}).{{0,50}})+'.format(search_text), result['markdown_data'])
                 for data in re_data:
                     search_result["included_in_text"][result['name']] += " " + data[0]
-        return render_template('document/doc_search.html', subject=text, setting=get_sidebar_info(),
+        return render_template('document/doc_search.html', searched_text=text, setting=get_sidebar_info(),
                                sidebar_list=get_current_list(), nav={'document': False}, result=search_result)
 
     # 문서 부가 기능

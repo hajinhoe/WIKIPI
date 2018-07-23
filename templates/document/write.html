@@ -13,7 +13,12 @@
     {{ subject }}
 {% endblock %}
 {% block section %}
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+<div class="btn-group" role="group" aria-label="Basic example">
+  <button type="button" id="input_tab" class="btn btn-secondary">탭 입력</button>
+  <a href="/upload/{{ subject }}"><button type="button" class="btn btn-secondary">파일 관리</button></a>
+</div>
+<h1>문서 작성</h1>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" id="editor-tab" data-toggle="tab" href="#editor" role="tab" aria-controls="home" aria-selected="true">편집기</a>
   </li>
@@ -23,10 +28,6 @@
 </ul>
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="editor" role="tabpanel" aria-labelledby="home-tab">
-      <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" id="input_tab" class="btn btn-secondary">탭 입력</button>
-          <a href="/upload/{{ subject }}"><button type="button" class="btn btn-secondary">파일 관리</button></a>
-      </div>
       <form name = "text" action="/save/{{ subject }}" method="post">
         <div class="form-group">
             <textarea id='text_editor' name = 'mytext' class="form-control" rows = 30>{% if text %}{{ text|safe }}{% endif %}</textarea>

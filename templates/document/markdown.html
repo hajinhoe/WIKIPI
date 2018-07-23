@@ -16,6 +16,7 @@
     {{ subject }}
 {% endblock %}
 {% block section %}
+    <h1>마크다운</h1>
     <form>
         <div class="form-group">
             <textarea id='text_editor' name = 'mytext' class="form-control" rows = 30 disabled>{% if text %}{{ text|safe }}{% endif %}</textarea>
