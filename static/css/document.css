@@ -36,12 +36,12 @@
 }
 
 #document blockquote{
-    background-color: #E3F2FD;
+    background-color: #F5F5F5;
     padding-left: 20px;
     padding-top : 10px;
     padding-bottom: 10px;
     margin-top: 20px;
-    border-left: 3px solid #2196F3;
+    border-left: 5px solid #424242;
 }
 
 #document code{
@@ -84,6 +84,14 @@
     max-height: 30%;
     width: 600px;
     height: 400px;
+}
+
+#document code p, #document blockquote p {
+    margin: 5px;
+}
+
+#document table{
+    margin: 20px;
 }
 
 @media only screen and (max-width: 600px) {

@@ -133,43 +133,110 @@ class Translator:
         self.parted_text = new_parted_text
 
     def make_list(self):
-        # unordered list
-        previous = False
         new_parted_text = []
-        rule = re.compile('^ \*(?P<string>.*)')
-        rule_of_previous = re.compile('(?P<string>.*)</ul>')
-        for line in self.parted_text:
-            if rule.search(line) is not None:
-                if previous:
-                    new_parted_text[len(new_parted_text) - 1] = rule_of_previous.sub('\g<string>',
-                                                                                     new_parted_text[len(new_parted_text) - 1])
-                    new_parted_text.append(rule.sub('<li>\g<string></li></ul>', line))
-                else:
-                    new_parted_text.append(rule.sub('<ul><li>\g<string></li></ul>', line))
-                previous = True
-            else:
-                new_parted_text.append(line)
-                previous = False
-        self.parted_text = new_parted_text
+        level = [0, 0, 0, 0, 0]  # ul은 -1, ol은 양수
+        now_level = 0
+        tail = ['', '', '', '', '']
+        rule = re.compile('^(?P<level> +)(?P<type>\*|[0-9]+\.)(?P<string>.*)')
 
-        # ordered list
-        previous = 0
-        new_parted_text = []
-        rule = re.compile('^ (?P<number>[0-9]+)\.(?P<string>.*)')
-        rule_of_previous = re.compile('(?P<string>.*)</ol>')
         for line in self.parted_text:
             element = rule.search(line)
-            if element is not None and previous + 1 == int(element.group('number')):
-                if previous > 0:
-                    new_parted_text[len(new_parted_text) - 1] = rule_of_previous.sub('\g<string>',
-                                                                                     new_parted_text[len(new_parted_text) - 1])
-                    new_parted_text.append(rule.sub('<li>\g<string></li></ol>', line))
-                else:
-                    new_parted_text.append(rule.sub('<ol><li>\g<string></li></ol>', line))
-                previous = previous + 1
-            else:
-                new_parted_text.append(line)
-                previous = 0
+            if element:
+                input_level = int(len(element.group('level')) / 2)
+
+                if len(element.group('level')) % 2 != 0 or now_level + 1 < input_level:
+                    tail_text = ''
+                    for i in range(now_level, -1, -1):
+                        tail_text += tail[i]
+                    new_parted_text.append(tail_text)
+                    now_level = 0
+                    tail = ['', '', '', '', '']
+                    level = [0, 0, 0, 0, 0]
+                    new_parted_text.append(line)
+                    continue
+
+                if element.group('type') == '*':  # ul 일 경우
+                    if input_level >= now_level:  # 레벨이 올라가거나 같은 경우
+                        if level[input_level - 1] == -1:
+                            line = rule.sub('<li>\g<string></li>', line)
+                            tail[input_level - 1] = '</ul>'
+                        elif level[input_level - 1] > 0:
+                            line = rule.sub('<ul><li>\g<string></li>', line)
+                            if input_level == now_level:
+                                line = tail[input_level - 1] + line
+                            tail[input_level - 1] = '</ul>'
+                        elif level[input_level - 1] == 0:
+                            line = rule.sub('<ul><li>\g<string></li>', line)
+                            tail[input_level - 1] = '</ul>'
+                    else:  # 레벨이 내려간 경우
+                        tail_text = ''
+                        if level[input_level - 1] > 0:  # 새로 시작해야함
+                            for i in range(now_level - 1, input_level - 2, -1):
+                                tail_text += tail[i]
+                                level[i] = 0
+                                tail[i] = ''
+                            line = tail_text + rule.sub('<ul><li>\g<string></li>', line)
+                            tail[input_level] = '</ul>'
+                        else:
+                            for i in range(now_level - 1, input_level - 1, -1):
+                                tail_text += tail[i]
+                                level[i] = 0
+                                tail[i] = ''
+                            line = tail_text + rule.sub('<li>\g<string></li>', line)
+                    level[input_level - 1] = -1
+                else:  # ol 일 경우
+                    if not (int(element.group('type')[:-1]) == 1 and level[input_level - 1] == -1) \
+                            and (int(element.group('type')[:-1]) != level[input_level - 1] + 1):
+                        tail_text = ''
+                        for i in range(now_level + 1):
+                            tail_text += tail[i]
+                        now_level = 0
+                        tail = ['', '', '', '', '']
+                        level = level = [0, 0, 0, 0, 0]
+                        line = tail_text + line
+                        new_parted_text.append(line)
+                        continue
+                    if input_level >= now_level:  # 레벨이 올라가거나 같은 경우
+                        if level[input_level - 1] == -1:
+                            line = rule.sub('<ol><li>\g<string></li>', line)
+                            if input_level == now_level:
+                                line = tail[input_level - 1] + line
+                            tail[input_level - 1] = '</ol>'
+                            level[input_level - 1] = 0
+                        elif level[input_level - 1] > 0:
+                            line = rule.sub('<li>\g<string></li>', line)
+                            tail[input_level - 1] = '</ol>'
+                        elif level[input_level - 1] == 0:
+                            line = rule.sub('<ol><li>\g<string></li>', line)
+                            tail[input_level - 1] = '</ol>'
+                    else:  # 레벨이 내려간 경우
+                        tail_text = ''
+                        if level[input_level - 1] == -1:  # 새로 시작해야함
+                            for i in range(now_level - 1, input_level - 2, -1):
+                                tail_text += tail[i]
+                                level[i] = 0
+                                tail[i] = ''
+                            line = tail_text + rule.sub('<ol><li>\g<string></li>', line)
+                            tail[input_level - 1] = '</ol>'
+                            level[input_level - 1] = 0
+                        else:
+                            for i in range(now_level - 1, input_level - 1, -1):
+                                tail_text += tail[i]
+                                level[i] = 0
+                                tail[i] = ''
+                            line = tail_text + rule.sub('<li>\g<string></li>', line)
+                    level[input_level - 1] += 1
+                now_level = input_level
+            elif now_level > 0:
+                tail_text = ''
+                for i in range(now_level, -1, -1):
+                    tail_text += tail[i]
+                line = tail_text + line
+                now_level = 0
+                tail = ['', '', '', '', '']
+                level = [0, 0, 0, 0, 0]
+            new_parted_text.append(line)
+
         self.parted_text = new_parted_text
 
     def make_table(self):
@@ -306,16 +373,23 @@ class Translator:
 
         self.parted_text = new_parted_text
 
-    def make_paragraph(self): # 별 다른 태그 요소가 없다면 paragraph로 처리합니다.
+    def make_paragraph(self):  # 별 다른 태그 요소가 없다면 paragraph로 처리합니다.
         new_parted_text = []
 
-        expression = re.compile('^(?!<.+?>)(?P<text>.*?)(?!</.+?>)$')
+        expression = re.compile('^(?!<.+?>)(?P<text>.+?)(?!</.+?>)$')
+        end_exp = re.compile('^(?P<text>.+?)(?P<end></code>|</blockquote>)$')
+        start_exp = re.compile('^(?P<start><code>|<blockquote>)(?P<text>.+?)$')
 
         for line in self.parted_text:
             element = expression.search(line)
 
             if element:
-                line = expression.sub('<p>\g<text></p>', line)
+                if end_exp.search(line):
+                    line = end_exp.sub('<p>\g<text></p>\g<end>', line)
+                else:
+                    line = expression.sub('<p>\g<text></p>', line)
+            elif start_exp.search(line):
+                line = start_exp.sub('\g<start><p>\g<text></p>', line)
 
             new_parted_text.append(line)
 
